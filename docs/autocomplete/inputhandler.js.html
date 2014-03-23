@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: inputhandler.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: inputhandler.js</h1>
+
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// Copyright (C) Plan-A Software Ltd. All Rights Reserved.
+//
+// Written by Kiran Lakhotia &lt;kiran@plan-a-software.co.uk>, 2014
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+'use strict';
+
+goog.provide('plana.ui.ac.InputHandler');
+
+goog.require('goog.Timer');
+goog.require('goog.a11y.aria');
+goog.require('goog.dom.selection');
+goog.require('goog.events.BrowserEvent');
+goog.require('goog.events.Event');
+goog.require('goog.events.EventHandler');
+goog.require('goog.events.EventTarget');
+goog.require('goog.events.EventType');
+goog.require('goog.events.KeyCodes');
+goog.require('goog.events.KeyHandler');
+goog.require('goog.string');
+goog.require('plana.ui.ac.RemoteObject');
+
+/**
+ * This class is heavily based on {@link goog.ui.ac.InputHandler} to provide
+ * the SelectionHandler interface required by {@link goog.ui.ac.AutoComplete}.
+ * It differs in a few ways, chief amongst them that it only supports a single
+ * input element instead of multiple ones. Thus, there's no juggling between
+ * active elements :)
+ * It also only uses a timer to monitor the input if the user non-left-clicked
+ * on the input, e.g. to paste text. The monitoring stops as soon as the user
+ * left clicks or types a character.
+ * We also removed the tight coupling to the {@link goog.ui.ac.AutoComplete}
+ * component, by dispatching events from here, rather than keeping a reference
+ * to the autocomplete component.
+ * Finally, we maintain a map of input entries to their server objects, in case
+ * the server returned an object instead of simple strings
+ *
+ * @constructor
+ * @extends {goog.events.EventTarget}
+ * @param {!Element} element The input element to use with the autocomplete
+ *     control
+ * @param {?boolean=} opt_multi Whether to allow multiple entries
+ *     (Default: false)
+ */
+plana.ui.ac.InputHandler = function(element, opt_multi) {
+  goog.events.EventTarget.call(this);
+
+  /**
+   * Reference to the input element we'er listening to
+   * @type {Element}
+   * @private
+   */
+  this.input_ = element;
+
+  /**
+   * The key handler for this input
+   * @type {googe.events.KeyHandler}
+   * @private
+   */
+  this.keyHandler_ = new goog.events.KeyHandler(element, false);
+  /* set the parent event target so that parents of this class can
+   * get notified of key events too
+   */
+  this.keyHandler_.setParentEventTarget(this);
+
+  /**
+   * The event handler to use to listen to key and mouse
+   * events
+   * @type {goog.events.EventHandler}
+   * @private
+   */
+  this.eventHandler_ = new goog.events.EventHandler(this);
+
+  /**
+   * An update timer that is used to watch for changes in
+   * the input element that might have been missed by the
+   * key event handler. For example, after pasting content
+   * via mouse operations
+   * @type {?goog.Timer}
+   * @private
+   */
+  this.updateTimer_ = null;
+
+  /**
+   * The interval to use for the update timer
+   * @type {number}
+   * @private
+   */
+  this.updateInterval_ = 150;
+
+  /**
+   * Flag whether a user can enter multiple items
+   * @type {boolean}
+   * @private
+   */
+  this.supportsMulti_ = opt_multi || false;
+
+  /**
+   * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
+   * The separators used if the input supports multiple entries.
+   * Added here because the base class doesn't expose this
+   * property
+   * @type {string}
+   * @private
+   */
+  this.separators_ = plana.ui.ac.InputHandler.STANDARD_LIST_SEPARATORS;
+
+  /**
+   * The regular expression to split the value of the text input
+   * @type {Object}
+   * @private
+   */
+  this.sepSplitRegEx_ = new RegExp('[' + this.separators_ + ']');
+
+  /**
+   * The default character to use for separating tokens in multi mode.
+   * This is used in 'autocomplete' mode, i.e. when automatically appending
+   * the separator when the user selected a match
+   * @type {string}
+   * @private
+   */
+  this.defaultSeparator_ = this.separators_.substring(0, 1);
+
+  /**
+   * The regular expression to make sure we have a separator + space
+   * for multi token inputs
+   * @type {Object}
+   * @private
+   */
+  this.formatRegEx_ = new RegExp(this.defaultSeparator_ + '([^\\s])', 'g');
+
+  /**
+   * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
+   * If we're in 'multi' mode, does typing a separator force the updating of
+   * suggestions?
+   * For example, if somebody finishes typing "obama, hillary,", should the
+   * last comma trigger updating suggestions in a guaranteed manner? Especially
+   * useful when the suggestions depend on complete keywords. Note that
+   * "obama, hill" (a leading sub-string of "obama, hillary" will lead to
+   * different and possibly irrelevant suggestions.
+   * @type {boolean}
+   * @private
+   */
+  this.separatorUpdates_ = true;
+
+  /**
+   * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
+   * If we're in 'multi' mode, does typing a separator force the current term
+   * to autocomplete?
+   * For example, if 'tomato' is a suggested completion and the user has typed
+   * 'to,', do we autocomplete to turn that into 'tomato,'?
+   * @type {boolean}
+   * @private
+   */
+  this.separatorSelects_ = true;
+
+  /**
+   * The previous value of the text input before a key event
+   * @type {string}
+   * @private
+   */
+  this.previousValue_ = '';
+
+  /**
+   * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
+   * Flag used to indicate that the IME key has been seen and we need to wait
+   * for the up event.
+   * @type {boolean}
+   * @private
+   */
+  this.isHandlingIME_ = false;
+
+  /**
+   * The most recent keycode
+   * @type {number}
+   * @private
+   */
+  this.lastKeyCode_ = -1;
+
+  /**
+   * This is an ordered list of objects matched by
+   * the text in the input
+   * @type {Array.&lt;Object|string>}
+   * @private
+   */
+  this.matchedObjects_ = [];
+
+  //setup listeners
+  this.eventHandler_.listen(this.keyHandler_,
+    goog.events.KeyHandler.EventType.KEY,
+    this.onKey_, false);
+  this.eventHandler_.listen(element,
+    goog.events.EventType.KEYUP,
+    this.onKeyUp_, false);
+  this.eventHandler_.listen(element,
+    goog.events.EventType.MOUSEDOWN,
+    this.onMouseDown_, false);
+  this.eventHandler_.listen(element,
+    goog.events.EventType.BLUR,
+    this.onBlur_, false);
+
+  //set aria role
+  goog.a11y.aria.setState(element, 'haspopup', true);
+
+};
+goog.inherits(plana.ui.ac.InputHandler, goog.events.EventTarget);
+
+/**
+ * Standard list separators.
+ * @type {string}
+ * @const
+ */
+plana.ui.ac.InputHandler.STANDARD_LIST_SEPARATORS = ',;';
+
+/**
+ * Cleanup.
+ * @override
+ */
+plana.ui.ac.InputHandler.prototype.disposeInternal = function() {
+  plana.ui.ac.InputHandler.superClass_.disposeInternal.call(this);
+
+  this.eventHandler_.unlisten(this.keyHandler_,
+    goog.events.KeyHandler.EventType.KEY,
+    this.onKey_, false);
+  this.eventHandler_.unlisten(this.input_,
+    goog.events.EventType.KEYUP,
+    this.onKeyUp_, false);
+  this.eventHandler_.unlisten(this.input_,
+    goog.events.EventType.KEYPRESS,
+    this.onKeyPress_, false);
+  this.eventHandler_.unlisten(this.input_,
+    goog.events.EventType.MOUSEDOWN,
+    this.onMouseDown_, false);
+  this.eventHandler_.unlisten(this.input_,
+    goog.events.EventType.BLUR,
+    this.onBlur_, false);
+
+  this.stopUpdateCheckTimer_();
+
+  this.input_ = null;
+  this.updateInterval_ = null;
+
+  this.keyHandler_.dispose();
+  this.keyHandler_ = null;
+
+  this.eventHandler_.dispose();
+  this.eventHandler_ = null;
+
+  this.supportsMulti_ = null;
+  this.separators_ = null;
+  this.defaultSeparator_ = null;
+  this.sepSplitRegEx_ = null;
+  this.formatRegEx_ = null;
+  this.separatorUpdates_ = null;
+  this.separatorSelects_ = null;
+  this.previousValue_ = null;
+  this.isHandlingIME_ = null;
+  this.lastKeyCode_ = null;
+
+  this.matchedObjects_.length = 0;
+  this.matchedObjects_ = null;
+};
+
+/**
+ * This function starts the timer to periodiacally check for updates
+ * to the input that have been missed by the key handler
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.startUpdateCheckTimer_ = function() {
+  this.updateTimer_ = new goog.Timer(this.updateInterval_);
+  this.eventHandler_.listen(this.updateTimer_,
+    goog.Timer.TICK, this.onTick_, false);
+  this.updateTimer_.start();
+};
+
+/**
+ * This function stops the timer that checks for input updates
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.stopUpdateCheckTimer_ = function() {
+  if (this.updateTimer_ != null) {
+    this.eventHandler_.unlisten(this.updateTimer_,
+      goog.Timer.TICK, this.onTick_, false);
+    this.updateTimer_.stop();
+    this.updateTimer_.dispose();
+    this.updateTimer_ = null;
+  }
+};
+
+/**
+ * Callback for mousedown events. If the mousedown is not a left button click
+ * we start a timer to monitor changes on the input element, because a user
+ * could be pasting text. We stop the timer when there's a subsequent
+ * left click (thus dismissing the context menu), or, the user types something
+ * @param {goog.events.BrowserEvent} e
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.onMouseDown_ = function(e) {
+  if (e.button != 0) {
+    //possibility of pasting text, so start timer
+    this.previousValue_ = this.input_.value;
+    this.startUpdateCheckTimer_();
+  } else {
+    this.stopUpdateCheckTimer_();
+  }
+};
+
+/**
+ * Callback for KEY events. Simply save the keycode
+ * @param {goog.events.KeyEvent} e The key event
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.onKey_ = function(e) {
+  this.lastKeyCode_ = e.keyCode;
+
+  switch (e.keyCode) {
+    case goog.events.KeyCodes.WIN_IME:
+      if (!this.isHandlingIME_) {
+        this.isHandlingIME_ = true;
+        this.eventHandler_.listen(this.input_,
+          goog.events.EventType.KEYPRESS,
+          this.onKeyPress_, false);
+        return;
+      }
+    case goog.events.KeyCodes.ESC:
+      //delete match at current index
+      var entries = this.getEntries();
+      if (entries.length > 0) {
+        var index = this.getCurrentTokenIndex(entries);
+        if (index == -1)
+          index = 0;
+        this.matchedObjects_.splice(index, 1);
+      }
+      break;
+    default:
+  }
+  this.handleSeparator_(e);
+};
+
+/**
+ * Handles a KEYPRESS event generated by typing in the active input element.
+ * Checks if IME input is ended.
+ * @param {goog.events.BrowserEvent} e Browser event object.
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.onKeyPress_ = function(e) {
+  if (this.isHandlingIME_ &amp;&amp;
+    this.lastKeyCode_ != goog.events.KeyCodes.WIN_IME) {
+    this.isHandlingIME_ = false;
+    this.eventHandler_.unlisten(this.input_,
+      goog.events.EventType.KEYPRESS,
+      this.onKeyPress_, false);
+  }
+};
+
+/**
+ * This function stops the update check timer if it's running, and fires a
+ * 'SELECT_HIGHLIGHTED' event if the user pressed enter. it also fires
+ * TEXT_CHANGED event if the input value was modified
+ * @param {goog.events.BrowserEvent} e Browser event object
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.onKeyUp_ = function(e) {
+
+  this.stopUpdateCheckTimer_();
+
+  if (this.isHandlingIME_ &amp;&amp;
+    (e.keyCode == goog.events.KeyCodes.ENTER ||
+      (e.keyCode == goog.events.KeyCodes.M &amp;&amp; e.ctrlKey))) {
+    this.isHandlingIME_ = false;
+    this.eventHandler_.unlisten(this.input_,
+      goog.events.EventType.KEYPRESS,
+      this.onKeyPress_, false);
+  }
+
+  if (goog.events.KeyCodes.isTextModifyingKeyEvent(e)) {
+    switch (e.keyCode) {
+      case goog.events.KeyCodes.TAB:
+      case goog.events.KeyCodes.ENTER:
+      case goog.events.KeyCodes.MAC_ENTER:
+        break;
+      default:
+        this.sendChangeNotification_();
+    }
+  }
+  this.previousValue_ = this.input_.value;
+};
+
+/**
+ * @see goog.ui.ac.InputHandler
+ * Handles a key event for a separator key.
+ * @param {goog.events.BrowserEvent} e Browser event object.
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.handleSeparator_ = function(e) {
+  var isSeparatorKey = this.supportsMulti_ &amp;&amp; e.charCode &amp;&amp;
+    this.separators_.indexOf(String.fromCharCode(e.charCode)) != -1;
+  if (this.separatorUpdates_ &amp;&amp; isSeparatorKey) {
+    this.sendChangeNotification_();
+  }
+  if (this.separatorSelects_ &amp;&amp; isSeparatorKey) {
+    var continueDefaultAction = this.dispatchEvent(
+      new goog.events.Event(
+        plana.ui.ac.InputHandler.EventType.SELECT_HIGHLIGHTED, this
+      )
+    );
+    if (!continueDefaultAction) {
+      e.preventDefault();
+    }
+  }
+};
+
+/**
+ * Send a DISMISS notification
+ * @param {?goog.events.BrowserEvent} e
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.onBlur_ = function(e) {
+  var self = this;
+  /*send blur event slightly delayed in case it fires before
+   *the click event in the renderer has been fired and handled
+   */
+  window.setTimeout(function() {
+    if (!self.isDisposed()) {
+      self.dispatchEvent(
+        new goog.events.Event(
+          plana.ui.ac.InputHandler.EventType.DISMISS, self
+        )
+      );
+    }
+    self = null;
+  }, 0);
+};
+
+/**
+ * Callback for the timer to check if the input changed. If it has,
+ * send a change notification
+ * @param {goog.events.Event} e
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.onTick_ = function(e) {
+  if (this.previousValue_ != this.input_.value) {
+    this.sendChangeNotification_();
+    this.previousValue_ = this.input_.value;
+  }
+};
+
+/**
+ * This function dispatched a change notification with the current token and
+ * the complete value of the input
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.sendChangeNotification_ = function() {
+  this.dispatchEvent({
+    type: plana.ui.ac.InputHandler.EventType.TEXT_CHANGED,
+    target: this,
+    token: this.getCurrentToken(),
+    fullstring: this.getValue()
+  });
+};
+
+/**
+ * This function updates the list of matched server objects
+ * @param {plana.ui.ac.RemoteObject} match
+ * @param {number} index The index of the edited item
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.updateMatchedObject_ = function(
+  match, index) {
+  if (index >= this.matchedObjects_.length)
+    this.matchedObjects_.push(match.getData());
+  else {
+    this.matchedObjects_[index] = match.getData();
+  }
+};
+
+/**
+ * This function returns the value of the text input
+ * @return {!string}
+ */
+plana.ui.ac.InputHandler.prototype.getValue = function() {
+  return this.input_.value;
+};
+
+/**
+ * This function returns the index of the token the current cursor is at
+ * in the input. For multi-token inputs, this is the index of the array that
+ * corresponds to the token in which the current cursor is at. For non-multi
+ * token inputs this returns -1. If the cursor is after the last word in the
+ * input, it returns the index of the last item
+ * @param {Array.&lt;string>} entries The list of tokens entered, split by the
+ *     default delimiters
+ * @return {!number}
+ */
+plana.ui.ac.InputHandler.prototype.getCurrentTokenIndex = function(entries) {
+  if (this.supportsMulti_) {
+    var cursorPos = goog.dom.selection.getStart(this.input_);
+    var numEntries = entries.length;
+    if (numEntries == 0 || cursorPos == 0) return 0;
+    else {
+      if (cursorPos == this.input_.value.length) return entries.length - 1;
+      var indx = 0;
+      for (var pos = 0; indx &lt; numEntries; ++indx) {
+        var tk = entries[indx];
+        pos += tk.length;
+        if (pos >= cursorPos) {
+          break;
+        }
+        // + 1 because we need to include separator
+        pos += 1;
+      }
+      if (indx >= numEntries) {
+        //get last token
+        return numEntries - 1;
+      }
+      return indx;
+    }
+  }
+  return -1;
+};
+
+/**
+ * This function returns the current token (trimmed) at the position of the
+ * cursor
+ * @return {!string}
+ */
+plana.ui.ac.InputHandler.prototype.getCurrentToken = function() {
+  if (this.supportsMulti_) {
+    var entries = this.getEntries();
+    var indx = this.getCurrentTokenIndex(entries);
+    if (indx == -1)
+      return '';
+    else
+      return goog.string.trim(entries[indx]);
+  }
+  return goog.string.trim(this.getValue());
+};
+
+/**
+ * This function returns an array of tokens in the text input
+ * @return {Array.&lt;string>}
+ */
+plana.ui.ac.InputHandler.prototype.getEntries = function() {
+  var val = this.getValue();
+  if (this.supportsMulti_) {
+    return val.split(this.sepSplitRegEx_);
+  } else
+    return [val];
+};
+
+/**
+ * Getter for the HTML input element
+ * @return {Element}
+ */
+plana.ui.ac.InputHandler.prototype.getInput = function() {
+  return this.input_;
+};
+
+/**
+ * This function returns a copy of the list of matched server objects
+ * @return {Array.&lt;Object|string>}
+ */
+plana.ui.ac.InputHandler.prototype.getMatchedObjects = function() {
+  if (this.supportsMulti_)
+    return this.matchedObjects_.slice(0);
+  else
+    return this.matchedObjects_.slice(0, 1);
+};
+
+/**
+ * This function initializes the input with a set of matched objects
+ * @param {Array.&lt;Object|string>} matches
+ */
+plana.ui.ac.InputHandler.prototype.setMatchedObjects = function(matches) {
+  this.matchedObjects_.length = 0;
+  this.input_.value = '';
+  //update text input
+  var numMatches = matches.length;
+  for (var i = 0; i &lt; numMatches; ++i) {
+    var match = matches[i];
+    this.selectRow(new plana.ui.ac.RemoteObject(match));
+  }
+};
+
+/**
+ * This function implements the seletionhandler interface. It updates
+ * the input value based on the value of the selected row.
+ * @param {plana.ui.ac.RemoteObject} row
+ */
+plana.ui.ac.InputHandler.prototype.selectRow = function(row) {
+  var index;
+  if (this.supportsMulti_) {
+    var entries = this.getEntries();
+    index = this.getCurrentTokenIndex(entries);
+    goog.asserts.assert(index >= 0 &amp;&amp; index &lt; entries.length);
+    entries[index] = row.toString();
+
+    //compute caret position
+    var pos = 0;
+    for (var i = 0; i &lt;= index; ++i) {
+      //+1 for separator
+      pos += entries[i].length + 1;
+    }
+
+    var str = entries.join(this.defaultSeparator_);
+    //if it's the last item, add ', '
+    if (index == entries.length - 1) {
+      str += this.defaultSeparator_ + ' ';
+      pos += 1;
+    }
+
+    var sep = this.defaultSeparator_ + ' ';
+    var adjustSeparators = function(regexMatch) {
+      pos += 1;
+      return sep + regexMatch.substring(1);
+    };
+    this.input_.value = str.replace(this.formatRegEx_, adjustSeparators);
+    sep = adjustSeparators = null;
+    goog.dom.selection.setStart(this.input_, pos);
+    goog.dom.selection.setEnd(this.input_, pos);
+  } else {
+    index = 0;
+    this.input_.value = row.toString();
+  }
+  //update match objects
+  this.updateMatchedObject_(row, index);
+  this.previousValue_ = this.input_.value;
+};
+
+/**
+ * This function implements the seletionhandler interface. It dispatches
+ * a change notification to the autocomplete, which in turns updates the
+ * token
+ * @param {boolean=} opt_force Whether we should force sending an update
+ * to set the token
+ */
+plana.ui.ac.InputHandler.prototype.update = function(opt_force) {
+  if (this.previousValue_ != this.input_.value || opt_force) {
+    this.sendChangeNotification_();
+    this.previousValue_ = this.input_.value;
+  }
+};
+
+/**
+ * Setter for chaning the interval when checking for changes to the input
+ * that were not handled by the keyhandler
+ * @param {!numeric} interval The value to set
+ */
+plana.ui.ac.InputHandler.prototype.setUpdateInterval = function(interval) {
+  goog.asserts.assert(goog.isNumber(interval),
+    'timer interval must be numeric');
+  this.updateInterval_ = interval;
+  if (this.updateTimer_ != null) {
+    this.stopUpdateCheckTimer_();
+    this.startUpdateCheckTimer_();
+  }
+};
+
+/**
+ * Setter for the separator characters to use for multi-token inputs
+ * @param {string} separators The list of separator characters used to split
+ *     tokens in the input
+ * @param {string=} opt_defaultSeparator The default character to use
+ *     during autocomplete events, i.e. the character that is appended by
+ *     default when a user selects a match
+ */
+plana.ui.ac.InputHandler.prototype.setSeparator = function(
+  separators, opt_defaultSeparator) {
+  if (separators == null || goog.string.isEmpty(separators)) {
+    this.supportsMulti_ = false;
+    this.defaultSeparator_ = '';
+  } else {
+    var sep;
+    if (goog.isDefAndNotNull(opt_defaultSeparator)) {
+      goog.asserts.assert(opt_defaultSeparator.length == 1,
+        'default separator string must be a single char');
+      sep = opt_defaultSeparator;
+    } else {
+      sep = separators.substring(0, 1);
+    }
+    //replace any old separator chars in the input
+    if (this.defaultSeparator_ != sep) {
+      var val = this.getValue();
+      var currentPos = goog.dom.selection.getStart(this.input_);
+      var regex = new RegExp(this.sepSplitRegEx_.source, 'g');
+      this.input_.value = val.replace(regex, sep);
+      goog.dom.selection.setStart(this.input_, currentPos);
+      goog.dom.selection.setEnd(this.input_, currentPos);
+      this.defaultSeparator_ = sep;
+      this.formatRegEx_ = new RegExp(this.defaultSeparator_ + '([^\\s])', 'g');
+    }
+    this.sepSplitRegEx_ = new RegExp('[' + separators + ']');
+    this.supportsMulti_ = true;
+  }
+};
+
+/**
+ * Sets whether separators perform autocomplete.
+ * @param {boolean} newValue Whether to autocomplete on separators.
+ */
+plana.ui.ac.InputHandler.prototype.setSeparatorCompletes = function(newValue) {
+  this.separatorUpdates_ = newValue;
+  this.separatorSelects_ = newValue;
+};
+
+
+/**
+ * Sets whether separators perform autocomplete.
+ * @param {boolean} newValue Whether to autocomplete on separators.
+ */
+plana.ui.ac.InputHandler.prototype.setSeparatorSelects = function(newValue) {
+  this.separatorSelects_ = newValue;
+};
+
+/**
+ * List of events dispatched by this class
+ * @enum {!string}
+ */
+plana.ui.ac.InputHandler.EventType = {
+  /**
+   * @desc the event dispatched if the input text
+   * changed. Could be as a result of keypresses,
+   * or by pasting text
+   */
+  TEXT_CHANGED: goog.events.getUniqueId('change'),
+  /**
+   * @desc the event dispatched if the input element
+   * looses focus and we should dimiss the autocomplete
+   */
+  DISMISS: goog.events.getUniqueId('dismiss'),
+  /**
+   * @desc the event dispatched if a match was selected
+   * and the autocomplete model needs updating
+   */
+  SELECT_HIGHLIGHTED: goog.events.getUniqueId('select')
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="plana.ui.ac.AutoComplete.html">AutoComplete</a></li><li><a href="plana.ui.ac.AutoCompleteRenderer.html">AutoCompleteRenderer</a></li><li><a href="plana.ui.ac.BootstrapRenderer.html">BootstrapRenderer</a></li><li><a href="plana.ui.ac.CachingObjectMatcher.html">CachingObjectMatcher</a></li><li><a href="plana.ui.ac.InputHandler.html">InputHandler</a></li><li><a href="plana.ui.ac.RemoteObject.html">RemoteObject</a></li><li><a href="plana.ui.ac.RemoteObjectMatcher.html">RemoteObjectMatcher</a></li><li><a href="plana.ui.ac.RemoteObjectMatcher.Event.html">Event</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Sun Mar 23 2014 15:35:56 GMT-0000 (GMT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
