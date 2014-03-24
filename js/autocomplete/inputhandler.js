@@ -334,16 +334,6 @@ plana.ui.ac.InputHandler.prototype.onKey_ = function(e) {
           this.onKeyPress_, false);
         return;
       }
-    case goog.events.KeyCodes.ESC:
-      //delete match at current index
-      var entries = this.getEntries();
-      if (entries.length > 0) {
-        var index = this.getCurrentTokenIndex(entries);
-        if (index == -1)
-          index = 0;
-        this.matchedObjects_[index] = null;
-      }
-      break;
     default:
   }
   this.handleSeparator_(e);
