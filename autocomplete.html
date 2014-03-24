@@ -12,180 +12,50 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="author" content="Plan-A Software Ltd">
-  <title>Autocomplete Demo</title>
+  <title>Autocomplete Demo - Plan-A Software Ltd.</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/autocomplete.css">
-  <style>
-  aside, footer, header, hgroup, section {
-    display: block;
-  }
-  body {
-    color: #404040;
-    font-family:"Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
-  }
-  html {
-    font-family: sans-serif;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-  }
-  ul {
-    margin-top: 0;
-  }
-  .container {
-    margin-right: auto;
-    margin-left: auto;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  .container:before, .container:after {
-    content:" ";
-    /* 1 */
-    display: table;
-    /* 2 */
-  }
-  .container:after {
-    clear: both;
-  }
-  .row {
-    margin-left: -15px;
-    margin-right: -15px;
-  }
-  .row:before, .row:after {
-    content:" ";
-    /* 1 */
-    display: table;
-    /* 2 */
-  }
-  .row:after {
-    clear: both;
-  }
-  .col-sm-6, .col-md-6, .col-xs-12 {
-    position: relative;
-    min-height: 1px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  .col-xs-12 {
-    width: 100%;
-  }
-  @media (min-width: 768px) {
-    .container {
-      width: 750px;
-    }
-    .col-sm-6 {
-      float: left;
-    }
-    .col-sm-6 {
-      width: 50%;
-    }
-  }
-  @media (min-width: 992px) {
-    .container {
-      width: 970px;
-    }
-    .col-md-6 {
-      float: left;
-    }
-    .col-md-6 {
-      width: 50%;
-    }
-  }
-  @media (min-width: 1200px) {
-    .container {
-      width: 1170px;
-    }
-  }
-  a {
-    color: #069;
-    text-decoration: none;
-  }
-  a:hover {
-    color: #EA0011;
-    text-decoration: underline;
-  }
-  hgroup {
-    margin-top: 50px;
-  }
-  footer {
-    margin: 50px 0 25px;
-  }
-  h1, h2, h3 {
-    color: #000;
-    line-height: 1.38em;
-    margin: 1.5em 0 .3em;
-  }
-  h1 {
-    font-size: 25px;
-    font-weight: 300;
-    border-bottom: 1px solid #fff;
-    margin-bottom: .5em;
-  }
-  h1:after {
-    content:"";
-    display: block;
-    width: 100%;
-    height: 1px;
-    background-color: #ddd;
-  }
-  h2 {
-    font-size: 19px;
-    font-weight: 400;
-  }
-  h3 {
-    font-size: 15px;
-    font-weight: 400;
-    margin: 0 0 .3em;
-  }
-  p {
-    margin: 0 0 2em;
-  }
-  p + h2 {
-    margin-top: 2em;
-  }
-  html {
-    background: #f5f5f5;
-    height: 100%;
-  }
-  code {
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 1px 5px;
-    color: #888;
-  }
-  pre {
-    display: block;
-    padding: 13.333px 20px;
-    margin: 0 0 20px;
-    font-size: 13px;
-    line-height: 1.4;
-    background-color: #fff;
-    border-left: 2px solid rgba(120, 120, 120, 0.35);
-    white-space: pre;
-    white-space: pre-wrap;
-    word-break: normal;
-    word-wrap: break-word;
-    overflow: auto;
-    font-family: Menlo, Monaco, "Liberation Mono", Consolas, monospace !important;
-  }
-  </style>
-
 </head>
 
 <body>
 
   <section class='container'>
     <hgroup>
-      <h1>Autocomplete</h1>
-      <p>Sources on <a href="https://github.com/plan-a-software/closure-js">github</a></p>
-      <p>This is an example of a multi-token autocomplete. Start typing and see if the server returns
-        any items that match your token. You can select a suggested item by either pressing the TAB key,
-        the ENTER key, or by typing the key for a token separator (i.e. either , or ;).</p>
-      <p>For multi-token inputs you can retrieve the list of selected suggestions by calling the <code>getModel()</code>
-        method. For single token inputs, this function either returns <code>null</code> or the selected item (could be a string or an object returned by the server).</p>
-      <p>If you type tokens that do not match any suggestion, then you can get a list of those token by call <code>getNonMatches()</code>.</p>
+      <h1>Autocomplete <a href="https://twitter.com/share" class="twitter-share-button" data-via="kiranlak" data-hashtags="plana,closurejs,googleclosure,javascript">Tweet</a> 
+        <div class="g-plus" data-action="share"></div>
+      </h1>
+      <p>
+        Sources on <a href="https://github.com/plan-a-software/closure-js">github</a>
+        <script>
+        ! function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0],
+            p = /^http:/.test(d.location) ? 'http' : 'https';
+          if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+          }
+        }(document, 'script', 'twitter-wjs');
+        </script>
+        <script type="text/javascript">
+        window.___gcfg = {
+          lang: 'en-GB'
+        };
+
+        (function() {
+          var po = document.createElement('script');
+          po.type = 'text/javascript';
+          po.async = true;
+          po.src = 'https://apis.google.com/js/platform.js';
+          var s = document.getElementsByTagName('script')[0];
+          s.parentNode.insertBefore(po, s);
+        })();
+        </script>
+      </p>
+      <p>This component is a wrapper around Google closure's
+        <code>goog.ui.ac.AutoComplete</code>component. It uses a caching remote object matcher that can retrieve autocomplete suggestions as plain strings or custom objects. It is best if the objects have a 'caption' property. This property is used to display the suggestions. If an object does not have a 'caption' property, <code>toString()</code> is used instead.</p>
     </hgroup>
 
     <div class="row" id="loading">
@@ -195,9 +65,196 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
       </section>
     </div>
     <div class="row" id="content" style="display: none;">
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Multi-token input</a>
+            </h4>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse in">
+            <div class="panel-body">
+              <p>This is an example of a multi-token autocomplete. Start typing and see if the server returns any items that match your token. You can select a suggested item by either pressing the TAB key, the ENTER key, or by typing the key for a token separator (i.e. either comma or semicolon).</p>
+              Please enter tokens:
+              <div id="multiToken"></div>
+              <table class="table table-bordered table-condensed">
+                <thead>
+                  <tr>
+                    <td>Statement</td>
+                    <td>Return value</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>autocomplete.getModel()</code>
+                    </td>
+                    <td>
+                      <code id="multiGetModel"></code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>autocomplete.getNonMatches()</code>
+                    </td>
+                    <td>
+                      <code id="multiGetNonMatches"></code>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>Code used to create the input:</p>
+              <pre>var uri = new goog.Uri('fake');
+                <br />var autocomplete = new plana.ui.ac.AutoComplete(uri, true, new plana.ui.ac.BootstrapRenderer());
+                <br />var loadingImg = goog.dom.createDom('img', { 'src': 'images/ajax-loader.gif' });
+                <br />autocomplete.setLoadingContent(loadingImg);
+                <br />var container = document.getElementById('multiToken');
+                <br />autocomplete.render(container);
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Single-token input</a>
+            </h4>
+          </div>
+          <div id="collapseTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+              <p>This is an example of a single-token autocomplete. Start typing and see if the server returns any items that match your token. You can select a suggested item by either pressing the TAB key, the ENTER key.</p>
+              Please enter tokens:
+              <div id="singleToken"></div>
+              <table class="table table-bordered table-condensed">
+                <thead>
+                  <tr>
+                    <td>Statement</td>
+                    <td>Return value</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>autocomplete.getModel()</code>
+                    </td>
+                    <td>
+                      <code id="singleGetModel"></code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>autocomplete.getNonMatches()</code>
+                    </td>
+                    <td>
+                      <code id="singleGetNonMatches"></code>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>Code used to create the input:</p>
+              <pre>var uri = new goog.Uri('fake');
+                <br />var autocomplete = new plana.ui.ac.AutoComplete(uri, false, new plana.ui.ac.BootstrapRenderer());
+                <br />var loadingImg = goog.dom.createDom('img', { 'src': 'images/ajax-loader.gif' });
+                <br />autocomplete.setLoadingContent(loadingImg);
+                <br />var container = document.getElementById('singleToken');
+                <br />autocomplete.render(container);
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
       <section class='col-xs-12 col-sm-12 col-md-12'>
-        Please enter a token:
-        <div id="autodiv"></div>
+        <h2>Options:</h2>
+        <p>The table below contains static properties of the autocomplete component. More settings can be configured via
+          the constructor and setter methods. Please see <a href="http://plan-a-software.github.io/docs/autocomplete/index.html" target_="_blank">the jsdoc for details.</a></p>
+        <table class="table table-bordered table-condensed">
+          <thead>
+            <tr>
+              <td>Option</td>
+              <td>Description</td>
+              <td>Default</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>plana.ui.ac.RemoteObjectMatcher.TOKEN_PARA</code>
+              </td>
+              <td>
+                The name of the token parameter passed to the server
+              </td>
+              <td>
+                <code>'token'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.ac.RemoteObjectMatcher.USE_SIMILAR_PARA</code>
+              </td>
+              <td>
+                The parameter name of the flag that specifies whether the server should return matches that are similar to the search token
+              </td>
+              <td>
+                <code>'user_similar'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.ac.RemoteObjectMatcher.MULTI_TOKEN_PARA</code>
+              </td>
+              <td>
+                The parameter name of the flag that specifies whether the autocomplete
+              </td>
+              <td>
+                <code>'multi'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.ac.RemoteObjectMatcher.MAX_MATCHES_PARA</code>
+              </td>
+              <td>
+                The name of the parameter that specifies how many matches the server should return
+              </td>
+              <td>
+                <code>'max_matches'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.ac.RemoteObjectMatcher.FULL_STRING_PARA</code>
+              </td>
+              <td>
+                The name of the parameter that contains the entire input value (useful for multi-token inputs)
+              </td>
+              <td>
+                <code>'fullstring'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY</code>
+              </td>
+              <td>
+                The property name of objects that contain the caption to display in the list of suggestions
+              </td>
+              <td>
+                <code>'caption'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.ac.AutoComplete.PLACEHOLDER_ROW_CSS</code>
+              </td>
+              <td>
+                The class name of the row showing loading and no match found messages
+              </td>
+              <td>
+                <code>'ac-fetching-row'</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </section>
       <section class='col-xs-12 col-sm-12 col-md-12'>
         <h2>Notes:</h2>
@@ -218,16 +275,7 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
           <br />
           <br />that can be searched.
         </p>
-        <p>We simulate a request taking 300ms to complete.</p>
-        <p>We used the following code to create the autocomplete on this page</p>
-        <pre>
-var uri = new goog.Uri('fake');
-var autocomplete = new plana.ui.ac.AutoComplete(uri, true, true, new plana.ui.ac.BootstrapRenderer());
-var loadingImg = goog.dom.createDom('img', { 'src': 'images/ajax-loader.gif' });
-var container = document.getElementById('autodiv');
-autocomplete.setLoadingContent(loadingImg);
-autocomplete.render(container);
-        </pre>
+        <p>We simulate a request taking 200ms to complete.</p>
       </section>
     </div>
 
@@ -238,6 +286,9 @@ autocomplete.render(container);
     </footer>
   </section>
   <script type="text/javascript" src="js/vendor/goog/base.js"></script>
+  <script type="text/javascript" src="js/vendor/jquery/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="js/vendor/bootstrap/bootstrap.min.js"></script>
+
   <script type="text/javascript">
   goog.require('goog.Uri');
   goog.require('goog.dom');
@@ -286,7 +337,7 @@ autocomplete.render(container);
   };
 
   var lastUri;
-  var sendDelay = 300;
+  var sendDelay = 200;
   var timerId = null;
   var sendInvalidResponse = false;
   MockXmlHttp.prototype.readyState = goog.net.XmlHttp.ReadyState.UNINITIALIZED;
@@ -392,16 +443,105 @@ autocomplete.render(container);
 
   <script type="text/javascript">
   var uri = new goog.Uri('fake');
-  var autocomplete = new plana.ui.ac.AutoComplete(uri, true, new plana.ui.ac.BootstrapRenderer());
+  var autocomplete = null;
   var loadingImg = goog.dom.createDom('img', {
     'src': 'images/ajax-loader.gif'
   });
-  var container = document.getElementById('autodiv');
-  autocomplete.setLoadingContent(loadingImg);
-  autocomplete.render(container);
+  var multiToken = true;
+
+  function updateGetModelCode() {
+    var code;
+    if (multiToken)
+      code = document.getElementById('multiGetModel');
+    else {
+      code = document.getElementById('singleGetModel');
+    }
+    var model = autocomplete.getModel();
+    if (model == null)
+      code.innerHTML = 'null';
+    else if (goog.isString(model))
+      code.innerHTML = model;
+    else {
+      code.innerHTML = goog.json.serialize(model);
+    }
+  }
+
+  function updateGetNonMatchesCode() {
+    var code;
+    if (multiToken)
+      code = document.getElementById('multiGetNonMatches');
+    else {
+      code = document.getElementById('singleGetNonMatches');
+    }
+    var nonmatches = autocomplete.getNonMatches();
+    code.innerHTML = goog.json.serialize(nonmatches);
+  }
+
+  function updateStatements(e) {
+    updateGetModelCode();
+    updateGetNonMatchesCode();
+  }
+
+  function createAutoComplete(parent) {
+    if (autocomplete != null) {
+      goog.events.unlisten(autocomplete, goog.ui.ac.AutoComplete.EventType.UPDATE,
+        updateStatements, false);
+      goog.events.unlisten(autocomplete.getAutoComplete(), goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE,
+        updateStatements, false);
+      autocomplete.dispose();
+    }
+    autocomplete = new plana.ui.ac.AutoComplete(uri, multiToken, new plana.ui.ac.BootstrapRenderer());
+    autocomplete.setLoadingContent(loadingImg);
+    autocomplete.render(parent);
+    goog.events.listen(autocomplete, goog.ui.ac.AutoComplete.EventType.UPDATE,
+      updateStatements, false);
+    goog.events.listen(autocomplete.getAutoComplete(), goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE,
+      updateStatements, false);
+    updateStatements();
+    autocomplete.focus();
+  }
+
+
+  var multiTokenPanel = document.getElementById('collapseOne');
+  var singleTokenPanel = document.getElementById('collapseTwo');
+
+  createAutoComplete(document.getElementById('multiToken'));
+
   goog.style.showElement(document.getElementById('loading'), false);
   goog.style.showElement(document.getElementById('content'), true);
   autocomplete.focus();
+
+  var showing = multiTokenPanel;
+
+  $('#accordion').on('hidden.bs.collapse', function(e) {
+    if (e.target == showing) {
+      if (showing == multiTokenPanel) {
+        $('#collapseTwo').collapse('show');
+        showing = singleTokenPanel;
+      } else {
+        $('#collapseOne').collapse('show');
+        showing = multiTokenPanel;
+      }
+    }
+  });
+  $('#accordion').on('shown.bs.collapse', function(e) {
+    if (e.target != showing) {
+      if (e.target == multiTokenPanel) {
+        $('#collapseTwo').collapse('hide');
+        showing = multiTokenPanel;
+      } else {
+        $('#collapseOne').collapse('hide');
+        showing = singleTokenPanel;
+      }
+    }
+    if (showing == multiTokenPanel) {
+      multiToken = true;
+      createAutoComplete(document.getElementById('multiToken'));
+    } else {
+      multiToken = false;
+      createAutoComplete(document.getElementById('singleToken'));
+    }
+  });
   </script>
 </body>
 

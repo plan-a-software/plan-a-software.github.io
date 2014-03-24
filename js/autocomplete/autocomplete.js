@@ -132,7 +132,7 @@ plana.ui.ac.AutoComplete = function(
   this.autoComplete = null;
 
   /**
-   * @see goog.ui.ac.InputHandler
+   * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
    * Whether to prevent the default behavior (moving focus to another element)
    * when tab is pressed. This occurs by default only for multi-value mode.
    * @type {boolean}
@@ -598,7 +598,7 @@ plana.ui.ac.AutoComplete.prototype.onUpdate_ = function(e) {
       }
       break;
     default:
-;
+      ;
   }
 };
 
@@ -681,19 +681,27 @@ plana.ui.ac.AutoComplete.prototype.getNonMatches = function() {
 
   var entries = this.inputHandler.getEntries();
   var matches = this.inputHandler.getMatchedObjects();
-  return goog.array.filter(entries, function(text, indx) {
+  var filtered = goog.array.filter(entries, function(text, indx) {
     if (goog.string.isEmptySafe(text)) return false;
+    text = goog.string.trim(text);
     for (var i = 0, match; match = matches[i]; ++i) {
-      if (goog.isString(match) && match == text ||
+      if (goog.isString(match) && goog.string.trim(match) == text ||
         (
-          goog.isDefAndNotNull(match['caption']) &&
-          match['caption'] == text
+          goog.isDefAndNotNull(
+            match[plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY]
+          ) &&
+          goog.string.trim(
+            match[plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY]
+          ) == text
         ) ||
-        (match.toString() == text)) {
+        (goog.string.trim(match.toString()) == text)) {
         matches.splice(i, 1);
         return false;
       }
     }
     return true;
+  });
+  return goog.array.map(filtered, function(text, indx) {
+    return goog.string.trim(text);
   });
 };

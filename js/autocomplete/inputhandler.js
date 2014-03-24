@@ -20,6 +20,7 @@ goog.provide('plana.ui.ac.InputHandler');
 
 goog.require('goog.Timer');
 goog.require('goog.a11y.aria');
+goog.require('goog.array');
 goog.require('goog.dom.selection');
 goog.require('goog.events.BrowserEvent');
 goog.require('goog.events.Event');
@@ -340,7 +341,7 @@ plana.ui.ac.InputHandler.prototype.onKey_ = function(e) {
         var index = this.getCurrentTokenIndex(entries);
         if (index == -1)
           index = 0;
-        this.matchedObjects_.splice(index, 1);
+        this.matchedObjects_[index] = null;
       }
       break;
     default:
@@ -391,6 +392,29 @@ plana.ui.ac.InputHandler.prototype.onKeyUp_ = function(e) {
       case goog.events.KeyCodes.MAC_ENTER:
         break;
       default:
+        var entries = this.getEntries();
+        var numEntries = entries.length;
+        var numMatches = this.matchedObjects_.length;
+        var index = 0;
+        for (; index < numEntries && index < numMatches; ++index) {
+          var token = goog.string.trim(entries[index]);
+          var match = this.matchedObjects_[index];
+          if (match != null) {
+            if (goog.isString(match))
+              match = goog.string.trim(match);
+            else {
+              var obj = new plana.ui.ac.RemoteObject(match);
+              match = goog.string.trim(obj.toString());
+              obj.dispose();
+            }
+            if (token != match) {
+              this.matchedObjects_[index] = null;
+            }
+          }
+        }
+        for (; index < numMatches; ++index) {
+          this.matchedObjects_[index] = null;
+        }
         this.sendChangeNotification_();
     }
   }
@@ -478,11 +502,10 @@ plana.ui.ac.InputHandler.prototype.sendChangeNotification_ = function() {
  */
 plana.ui.ac.InputHandler.prototype.updateMatchedObject_ = function(
   match, index) {
-  if (index >= this.matchedObjects_.length)
-    this.matchedObjects_.push(match.getData());
-  else {
+  if (match == null) {
+    this.matchedObjects_[index] = null;
+  } else
     this.matchedObjects_[index] = match.getData();
-  }
 };
 
 /**
@@ -572,10 +595,15 @@ plana.ui.ac.InputHandler.prototype.getInput = function() {
  * @return {Array.<Object|string>}
  */
 plana.ui.ac.InputHandler.prototype.getMatchedObjects = function() {
+  var filtered = goog.array.filter(this.matchedObjects_, function(match, indx) {
+    if (match != null)
+      return true;
+    return false;
+  });
   if (this.supportsMulti_)
-    return this.matchedObjects_.slice(0);
+    return filtered.slice(0);
   else
-    return this.matchedObjects_.slice(0, 1);
+    return filtered.slice(0, 1);
 };
 
 /**
