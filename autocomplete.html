@@ -460,7 +460,7 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
     if (model == null)
       code.innerHTML = 'null';
     else if (goog.isString(model))
-      code.innerHTML = model;
+      code.innerHTML = goog.string.quote(model);
     else {
       code.innerHTML = goog.json.serialize(model);
     }
