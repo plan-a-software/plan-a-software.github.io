@@ -128,7 +128,7 @@ plana.ui.ac.CachingObjectMatcher = function(
   /**
    * The handler to use for handling matches returned by
    * the server
-   * @type {Function}
+   * @type {?Function}
    * @private
    */
   this.mostRecentMatchHandler_ = null;
@@ -392,7 +392,7 @@ plana.ui.ac.CachingObjectMatcher.prototype.getSimilarMatchesForRows = function(
  * It passes matches to the autocomplete
  * @param {string} token Token to match
  * @param {number} maxMatches Max number of matches to return
- * @param {Function} matchHandler callback to execute after matching
+ * @param {?Function} matchHandler callback to execute after matching
  * @param {string=} opt_fullstring The complete string in the input
  *     textbox
  */
@@ -415,7 +415,8 @@ plana.ui.ac.CachingObjectMatcher.prototype.requestMatchingRows =
 
     var matches = this.getCachedMatches(token, maxMatches);
 
-    matchHandler(token, matches);
+    if (matchHandler)
+      matchHandler(token, matches);
     this.mostRecentMatches_ = matches;
 };
 
@@ -509,8 +510,9 @@ plana.ui.ac.CachingObjectMatcher.prototype.onRemoteMatcherEvent_ = function(e) {
       else
         this.currentState_ = plana.ui.ac.CachingObjectMatcher.State.READY;
 
-      this.mostRecentMatchHandler_(this.mostRecentToken_,
-        this.mostRecentMatches_, options);
+      if (this.mostRecentMatchHandler_)
+        this.mostRecentMatchHandler_(this.mostRecentToken_,
+          this.mostRecentMatches_, options);
 
       // We clear the cache *after* running the local match, so we don't
       // suddenly remove results just because the remote match came back.
@@ -521,8 +523,9 @@ plana.ui.ac.CachingObjectMatcher.prototype.onRemoteMatcherEvent_ = function(e) {
       this.currentState_ = plana.ui.ac.CachingObjectMatcher.State.ERROR;
       //show cached items if we have any...
       //maybe notify listeners somehow of error to show an error
-      this.mostRecentMatchHandler_(this.mostRecentToken_,
-        this.mostRecentMatches_, options);
+      if (this.mostRecentMatchHandler_)
+        this.mostRecentMatchHandler_(this.mostRecentToken_,
+          this.mostRecentMatches_, options);
       break;
     default:
       throw 'Invalid remote event type:' + e.type;

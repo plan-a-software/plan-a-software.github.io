@@ -322,7 +322,8 @@ plana.ui.ac.AutoComplete.prototype.enterDocument = function() {
   var handler = this.getHandler();
   handler.listen(this.autoComplete, [
     goog.ui.ac.AutoComplete.EventType.UPDATE,
-    goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE
+    goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE,
+    goog.ui.ac.AutoComplete.EventType.DISMISS
   ], this.onUpdate_, false, this);
   handler.listen(this.inputHandler,
     goog.object.getValues(plana.ui.ac.InputHandler.EventType),
@@ -339,7 +340,8 @@ plana.ui.ac.AutoComplete.prototype.exitDocument = function() {
   var handler = this.getHandler();
   handler.unlisten(this.autoComplete, [
     goog.ui.ac.AutoComplete.EventType.UPDATE,
-    goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE
+    goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE,
+    goog.ui.ac.AutoComplete.EventType.DISMISS
   ], this.onUpdate_, false, this);
   handler.unlisten(this.inputHandler,
     goog.object.getValues(plana.ui.ac.InputHandler.EventType),
@@ -596,6 +598,10 @@ plana.ui.ac.AutoComplete.prototype.onUpdate_ = function(e) {
           this.hidePlaceHolders();
           break;
       }
+      break;
+    case goog.ui.ac.AutoComplete.EventType.DISMISS:
+      this.hidePlaceHolders();
+      this.autoComplete.getRenderer().dismiss();
       break;
     default:
       ;
