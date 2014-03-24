@@ -11,6 +11,7 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="author" content="Plan-A Software Ltd">
   <title>TypeaheadSearch Demo</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -181,7 +182,11 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
   <section class='container'>
     <hgroup>
       <h1>TypeaheadSearch</h1>
-      <p>Sources on <a href="https://github.com/plan-a-software/closure-js">github</a>
+      <p>Sources on <a href="https://github.com/plan-a-software/closure-js">github</a></p>
+      <p>This is an example of a typeahead search. Start typing and see if the server returns
+        any items that match your token. Press ENTER or click on the search icon to trigger a fulltext search
+        on the server. This component dispatches events to notify the user when a fulltext search has finished and
+        if it returned any results.</p>
     </hgroup>
 
     <div class="row" id="loading">
@@ -225,6 +230,7 @@ var typeahead = new plana.ui.ts.TypeaheadSearch(uri);
 var loadingImg = goog.dom.createDom('img', { 'src': 'images/ajax-loader.gif' });
 var container = document.getElementById('autodiv');
 typeahead.setLoadingContent(loadingImg);
+typeahead.setPlaceholder('Search...');
 typeahead.render(container);
         </pre>
       </section>
