@@ -14,191 +14,63 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
   <meta name="description" content="This page lists the javascript components developed by Plan-A Software Ltd. made available for demonstration purposes">
   <meta name="author" content="Plan-A Software Ltd">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Autocomplete Demo</title>
-
-  <style>
-  aside, footer, header, hgroup, section {
-    display: block;
-  }
-  body {
-    color: #404040;
-    font-family:"Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
-  }
-  html {
-    font-family: sans-serif;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-  }
-  ul {
-    margin-top: 0;
-  }
-  .container {
-    margin-right: auto;
-    margin-left: auto;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  .container:before, .container:after {
-    content:" ";
-    /* 1 */
-    display: table;
-    /* 2 */
-  }
-  .container:after {
-    clear: both;
-  }
-  .row {
-    margin-left: -15px;
-    margin-right: -15px;
-  }
-  .row:before, .row:after {
-    content:" ";
-    /* 1 */
-    display: table;
-    /* 2 */
-  }
-  .row:after {
-    clear: both;
-  }
-  .col-sm-6, .col-md-6, .col-xs-12 {
-    position: relative;
-    min-height: 1px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  .col-xs-12 {
-    width: 100%;
-  }
-  @media (min-width: 768px) {
-    .container {
-      width: 750px;
-    }
-    .col-sm-6 {
-      float: left;
-    }
-    .col-sm-6 {
-      width: 50%;
-    }
-  }
-  @media (min-width: 992px) {
-    .container {
-      width: 970px;
-    }
-    .col-md-6 {
-      float: left;
-    }
-    .col-md-6 {
-      width: 50%;
-    }
-  }
-  @media (min-width: 1200px) {
-    .container {
-      width: 1170px;
-    }
-  }
-  a {
-    color: #069;
-    text-decoration: none;
-  }
-  a:hover {
-    color: #EA0011;
-    text-decoration: underline;
-  }
-  hgroup {
-    margin-top: 50px;
-  }
-  footer {
-    margin: 50px 0 25px;
-  }
-  h1, h2, h3 {
-    color: #000;
-    line-height: 1.38em;
-    margin: 1.5em 0 .3em;
-  }
-  h1 {
-    font-size: 25px;
-    font-weight: 300;
-    border-bottom: 1px solid #fff;
-    margin-bottom: .5em;
-  }
-  h1:after {
-    content:"";
-    display: block;
-    width: 100%;
-    height: 1px;
-    background-color: #ddd;
-  }
-  h2 {
-    font-size: 19px;
-    font-weight: 400;
-  }
-  h3 {
-    font-size: 15px;
-    font-weight: 400;
-    margin: 0 0 .3em;
-  }
-  p {
-    margin: 0 0 2em;
-  }
-  p + h2 {
-    margin-top: 2em;
-  }
-  html {
-    background: #f5f5f5;
-    height: 100%;
-  }
-  code {
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 1px 5px;
-    color: #888;
-  }
-  pre {
-    display: block;
-    padding: 13.333px 20px;
-    margin: 0 0 20px;
-    font-size: 13px;
-    line-height: 1.4;
-    background-color: #fff;
-    border-left: 2px solid rgba(120, 120, 120, 0.35);
-    white-space: pre;
-    white-space: pre-wrap;
-    word-break: normal;
-    word-wrap: break-word;
-    overflow: auto;
-    font-family: Menlo, Monaco, "Liberation Mono", Consolas, monospace !important;
-  }
-  </style>
-
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <title>Google Closure Demos</title>
 </head>
 
 <body>
-
-  <section class='container'>
-    <hgroup>
-      <h1>Welcome to demo page for closure-js</h1>
-    </hgroup>
+  <div class="container">
     <div class="row">
-      <section class='col-xs-12 col-sm-12 col-md-12'>
-        <section>
-          <h2>Autocomplete</h2>
-          <p>Click <a href="autocomplete.html">here</a> for the autocomplete demo.</p>
-        </section>
-        <section>
-          <h2>Typeahead search</h2>
-          <p>Click <a href="typeaheadsearch.html">here</a> for the typeahead search demo.</p>
-        </section>
-      </section>
+      <div class="col-lg-12">
+        <div class="page-header">
+          <h1>Welcome to demo pages for additional Google closure components</h1>
+        </div>
+      </div>
     </div>
-
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="jumbotron">
+          <h1>AutoComplete</h1>
+          <p>This component is a wrapper around Google closure's
+            <code>goog.ui.ac.AutoComplete</code>component. It uses a caching remote object matcher that can retrieve autocomplete suggestions as plain strings or custom objects. It is best if the objects have a 'caption' property. This property is used to display the suggestions. If an object does not have a 'caption' property,
+            <code>toString()</code>is used instead.</p>
+          <p>
+            <a href="autocomplete.html" class="btn btn-primary btn-lg">See Demo</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="jumbotron">
+          <h1>TypeaheadSearch</h1>
+          <p>This component is a wrapper around
+            <a href="autocomplete.html">
+              <code>plana.ui.ac.AutoComplete</code>
+            </a>. It provides an additional search button that can be used to trigger a fulltext search on the server.</p>
+          <p>
+            <a href="typeaheadsearch.html" class="btn btn-primary btn-lg">See Demo</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="jumbotron">
+          <h1>TagsInput</h1>
+          <p>This component creates a tag input.</p>
+          <p>
+            <a href="tagsinput.html" class="btn btn-primary btn-lg">See Demo</a>
+          </p>
+        </div>
+      </div>
+    </div>
     <footer>
       <div>
         <a href="http://www.plan-a-software.co.uk/">&copy; Plan-A Software Ltd</a>
       </div>
     </footer>
-  </section>
+  </div>
 </body>
 
 </html>
