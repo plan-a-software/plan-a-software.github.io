@@ -1,0 +1,376 @@
+<!doctype html>
+<!--
+
+Copyright (C) Plan-A Software Ltd. All Rights Reserved.
+
+Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
+
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="author" content="Plan-A Software Ltd">
+  <title>Tagsinput Demo - Plan-A Software Ltd.</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/tagsinput.css">
+  <link rel="stylesheet" href="css/autocomplete.css">
+  <style>
+  .glyphicon {
+    cursor: pointer;
+  }
+  </style>
+</head>
+
+<body>
+
+  <section class='container'>
+    <hgroup>
+      <h1>Tagsinput <a href="https://twitter.com/share" class="twitter-share-button" data-via="kiranlak" data-hashtags="plana,closurejs,googleclosure,javascript">Tweet</a> 
+        <div class="g-plus" data-action="share"></div>
+      </h1>
+      <p>
+        Sources on <a href="https://github.com/plan-a-software/closure-js">github</a>
+        <script>
+        ! function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0],
+            p = /^http:/.test(d.location) ? 'http' : 'https';
+          if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+          }
+        }(document, 'script', 'twitter-wjs');
+        </script>
+        <script type="text/javascript">
+        window.___gcfg = {
+          lang: 'en-GB'
+        };
+
+        (function() {
+          var po = document.createElement('script');
+          po.type = 'text/javascript';
+          po.async = true;
+          po.src = 'https://apis.google.com/js/platform.js';
+          var s = document.getElementsByTagName('script')[0];
+          s.parentNode.insertBefore(po, s);
+        })();
+        </script>
+      </p>
+      <p>This component creates a tag input. We pre-populated the tag list with a
+        <code>Hello</code>object and
+        <code>World</code>string.</p>
+    </hgroup>
+
+    <div class="row" id="loading">
+      <section class='col-xs-12 col-sm-12 col-md-12'>
+        <h1>Downloading closure scripts...</h1>
+        <p>This may take a while because we're loading un-minified code</p>
+      </section>
+    </div>
+    <div class="row" id="content" style="display: none;">
+      <section class='col-xs-12 col-sm-12 col-md-12'>
+        <label>
+          <input type="checkbox" id="enableCreate" />Allow creating new tags
+        </label>
+        <div id="tagsdiv"></div>
+        <table class="table table-bordered table-condensed" style="margin-top:10px; table-layout: fixed;">
+          <thead>
+            <tr>
+              <td width="200px">Statement</td>
+              <td>Return value</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>tagsinput.getModel()</code>
+              </td>
+              <td>
+                <code id="model" style="white-space: pre-wrap"></code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Code used to create the input:</p>
+        <pre>var tagsinput = new plana.ui.tags.TagsInput(new goog.Uri('fake'));
+          <br />tagsinput.setModel([{tagClass: 'label-warning', id:1, caption: 'Hello'}, 'World']);
+          <br />var loadingImg = goog.dom.createDom('img', { 'src': 'images/ajax-loader.gif' });
+          <br />tagsinput.getAutoComplete().setLoadingContent(loadingImg);
+          <br />var container = document.getElementById('tagsdiv');
+          <br />tagsinput.render(container);
+        </pre>
+      </section>
+      <section class='col-xs-12 col-sm-12 col-md-12'>
+        <h2>Options:</h2>
+        <p>The table below contains static properties of the tagsinput component. More settings can be configured via the constructor and setter methods. Please see <a href="http://plan-a-software.github.io/docs/tagsinput/index.html" target_="_blank">the jsdoc for details.</a>
+        </p>
+        <table class="table table-bordered table-condensed">
+          <thead>
+            <tr>
+              <td>Option</td>
+              <td>Description</td>
+              <td>Default</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>plana.ui.tags.TagsInput.DEFAULT_TAG_CSS</code>
+              </td>
+              <td>
+                The default css class to use for rendering tags
+              </td>
+              <td>
+                <code>'label-info'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.tags.TagsInput.MSG_ADD_TAG_PLACEHOLDER</code>
+              </td>
+              <td>
+                The placeholder message to display in the input. Set to an empty string to disable placeholder text
+              </td>
+              <td>
+                <code>'Add tags'</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>plana.ui.tags.TagsInput.FADE_SPEED</code>
+              </td>
+              <td>
+                The default speed to use for the fade-in/out animations if a users is trying to add a tag that already exists
+              </td>
+              <td>
+                <code>'Add tags'</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section class='col-xs-12 col-sm-12 col-md-12'>
+        <h2>Notes:</h2>
+        <p>
+          This examples contains two existing tag objects with a 'caption' property:
+          <br />
+          <br />
+          <code>
+            {id: 1, caption: 'hello'}, {id: 2, caption: 'world'}
+          </code>
+          <br />
+          <br />and the following string array:
+          <br />
+          <br />
+          <code>
+            ['coding', 'on', 'keep', 'calm', 'and', 'carry']
+          </code>
+          <br />
+          <br />that can be searched.
+        </p>
+        <p>We simulate a request taking 200ms to complete.</p>
+      </section>
+    </div>
+
+    <footer>
+      <div>
+        <a href="http://www.plan-a-software.co.uk/">&copy; Plan-A Software Ltd</a>
+      </div>
+    </footer>
+  </section>
+  <script type="text/javascript" src="js/vendor/goog/base.js"></script>
+  <script type="text/javascript">
+  goog.require('goog.i18n.DateTimeFormat');
+  goog.require('goog.i18n.DateTimeParse');
+  goog.require('goog.i18n.DateTimeSymbols_en_GB');
+
+  goog.require('goog.Uri');
+  goog.require('goog.dom');
+  goog.require('goog.events.KeyCodes');
+  goog.require('goog.net.WrapperXmlHttpFactory');
+  goog.require('goog.testing.net.XhrIo');
+  goog.require('goog.ui.ac.Renderer');
+  goog.require('goog.ui.Component');
+  </script>
+
+  <script type="text/javascript" src="js/autocomplete/remoteobjectmatcher.js"></script>
+  <script type="text/javascript" src="js/autocomplete/autocompleterenderer.js"></script>
+  <script type="text/javascript" src="js/autocomplete/cachingobjectmatcher.js"></script>
+  <script type="text/javascript" src="js/autocomplete/inputhandler.js"></script>
+  <script type="text/javascript" src="js/autocomplete/autocomplete.js"></script>
+
+  <script type="text/javascript" src="js/tagsinput/tagsinput.js"></script>
+
+  <script type="text/javascript">
+  var mockServerObjects = [{
+    id: 1,
+    caption: 'hello'
+  }, {
+    id: 2,
+    caption: 'world'
+  }];
+  var mockServerStrings = [
+    'coding',
+    'on',
+    'keep',
+    'calm',
+    'and',
+    'carry'
+  ];
+
+  function MockXmlHttp() {
+    /**
+     * The headers for this XmlHttpRequest.
+     * @type {!Object.<string>}
+     */
+    this.headers = {};
+
+    /**
+     * The request data string
+     * @type {string}
+     */
+    this.content;
+  };
+
+  var lastUri;
+  var sendDelay = 200;
+  var timerId = null;
+  var sendInvalidResponse = false;
+  MockXmlHttp.prototype.readyState = goog.net.XmlHttp.ReadyState.UNINITIALIZED;
+
+  MockXmlHttp.prototype.status = 200;
+
+  MockXmlHttp.syncSend = true;
+
+  MockXmlHttp.prototype.send = function(opt_data) {
+    this.content = opt_data;
+    this.readyState = goog.net.XmlHttp.ReadyState.UNINITIALIZED;
+
+    lastMockXmlHttp.responseText = this.getResponseJson();
+
+    if (MockXmlHttp.syncSend) {
+      this.complete();
+    }
+
+  };
+
+
+  MockXmlHttp.prototype.complete = function() {
+    this.readyState = goog.net.XmlHttp.ReadyState.LOADING;
+    this.onreadystatechange();
+
+    this.readyState = goog.net.XmlHttp.ReadyState.LOADED;
+    this.onreadystatechange();
+
+    this.readyState = goog.net.XmlHttp.ReadyState.INTERACTIVE;
+    this.onreadystatechange();
+
+    if (timerId != null) {
+      window.clearTimeout(timerId);
+    }
+    var self = this;
+    timerId = window.setTimeout(function() {
+      self.readyState = goog.net.XmlHttp.ReadyState.COMPLETE;
+      self.onreadystatechange();
+      self = null;
+      timerId = null;
+    }, sendDelay);
+  };
+
+
+  MockXmlHttp.prototype.open = function(verb, uri, async) {
+    lastUri = uri;
+  };
+
+  MockXmlHttp.prototype.abort = function() {
+    if (timerId) {
+      window.clearTimeout(timerId);
+      timerId = null;
+    }
+  };
+
+  MockXmlHttp.prototype.setRequestHeader = function(key, value) {
+    this.headers[key] = value;
+  };
+
+  MockXmlHttp.prototype.getResponseJson = function(opt_xssiPrefix) {
+    //var uri = new goog.Uri(lastUri);
+    var query = new goog.Uri.QueryData(this.content);
+    var filterStrings = query.get('token').split(',');
+    filterStrings = [filterStrings.shift()];
+    var matches = [];
+    for (var i = 0, str; str = filterStrings[i]; ++i) {
+      str = goog.string.trim(str);
+      for (var o = 0, obj; obj = mockServerObjects[o]; ++o) {
+        if (goog.string.contains(obj.caption, str) ||
+          goog.string.caseInsensitiveCompare(obj.caption, str) == 0) {
+          matches.push(obj);
+        }
+      }
+      for (var s = 0, sobj; sobj = mockServerStrings[s]; ++s) {
+        if (goog.string.contains(sobj, str) ||
+          goog.string.caseInsensitiveCompare(sobj, str) == 0) {
+          matches.push(sobj);
+        }
+      }
+    }
+    return goog.json.serialize(matches);
+  };
+
+  var lastMockXmlHttp;
+  goog.net.XmlHttp.setGlobalFactory(new goog.net.WrapperXmlHttpFactory(
+    function() {
+      lastMockXmlHttp = new MockXmlHttp();
+      return lastMockXmlHttp;
+    },
+    function() {
+      return {};
+    }));
+  </script>
+
+  <script type="text/javascript">
+  var uri = new goog.Uri('fake');
+  var allowCreate = false;
+  var tagsinput = new plana.ui.tags.TagsInput(uri, allowCreate);
+  tagsinput.setModel([{
+    tagClass: 'label-warning',
+    id: 1,
+    caption: 'Hello'
+  }, 'World']);
+  var loadingImg = goog.dom.createDom('img', {
+    'src': 'images/ajax-loader.gif'
+  });
+  var container = document.getElementById('tagsdiv');
+  tagsinput.getAutoComplete().setLoadingContent(loadingImg);
+  tagsinput.render(container);
+  goog.style.showElement(document.getElementById('loading'), false);
+  goog.style.showElement(document.getElementById('content'), true);
+  tagsinput.focus();
+  </script>
+  <script type="text/javascript">
+  var checkbox = document.getElementById('enableCreate');
+  var modelDiv = document.getElementById('model');
+  model.innerHTML = goog.json.serialize(tagsinput.getModel());
+  goog.events.listen(checkbox, goog.events.EventType.CLICK, function(e) {
+    tagsinput.allowCreateTags(e.target.checked);
+    tagsinput.focus();
+  }, false);
+  goog.events.listen(tagsinput, goog.object.getValues(plana.ui.tags.TagsInput.EventType), function(e) {
+    switch (e.type) {
+      case plana.ui.tags.TagsInput.EventType.INVALID:
+        alert('You cannot create new tags. If you want to enable this feature, please click the checkbox');
+        break;
+      case plana.ui.tags.TagsInput.EventType.ADDED:
+      case plana.ui.tags.TagsInput.EventType.REMOVED:
+        model.innerHTML = goog.json.serialize(tagsinput.getModel());
+        break;
+    }
+  }, false);
+  </script>
+</body>
+
+</html>

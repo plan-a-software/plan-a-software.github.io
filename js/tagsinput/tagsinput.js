@@ -333,6 +333,10 @@ plana.ui.tags.TagsInput.prototype.onRemoveTag_ = function(e) {
     if (btn == e.target) {
       this.removeTag_(el, i);
       tags.splice(i, 1);
+      this.dispatchEvent({
+        type: plana.ui.tags.TagsInput.EventType.REMOVED,
+        tag: dom.getTextContent(el)
+      });
       break;
     }
   }
@@ -374,6 +378,10 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
   if (tags == null) {
     //this will render the tags
     this.setModel([e.data]);
+    this.dispatchEvent({
+      type: plana.ui.tags.TagsInput.EventType.ADDED,
+      tag: dom.getTextContent(this.tags_[this.tags_.length - 1])
+    });
   } else {
     var dom = this.dom_;
     var tagObj = new plana.ui.ac.RemoteObject(e.data);
@@ -402,6 +410,10 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
       var numTags = this.tags_.length;
       this.renderTag_(e.data, numTags);
       tags.push(e.data);
+      this.dispatchEvent({
+        type: plana.ui.tags.TagsInput.EventType.ADDED,
+        tag: dom.getTextContent(this.tags_[this.tags_.length - 1])
+      });
     } else {
       //fade out then back in
       var tag = this.tags_[duplicateIndex];
@@ -455,8 +467,13 @@ plana.ui.tags.TagsInput.prototype.onKey_ = function(e) {
         goog.asserts.assert(tags != null,
           'model cannot be null when removing tags via backspace');
         var index = numTags - 1;
-        this.removeTag_(this.tags_[index], index);
+        var tag = this.tags_[index];
+        this.removeTag_(tag, index);
         tags.splice(index, 1);
+        this.dispatchEvent({
+          type: plana.ui.tags.TagsInput.EventType.REMOVED,
+          tag: this.dom_.getTextContent(tag)
+        });
         e.preventDefault();
         e.stopPropagation();
       }
@@ -496,6 +513,22 @@ plana.ui.tags.TagsInput.prototype.setCaseInsensitive = function(newValue) {
 };
 
 /**
+ * Setter for whether we allow the creation of new tags or not
+ * @param {boolean} newValue The value to set to
+ */
+plana.ui.tags.TagsInput.prototype.allowCreateTags = function(newValue) {
+  this.allowCreateTags_ = newValue;
+};
+
+/**
+ * Getter for the autocomplete component
+ * @return {plana.ui.ac.AutoComplete}
+ */
+plana.ui.tags.TagsInput.prototype.getAutoComplete = function() {
+  return this.autocomplete_;
+};
+
+/**
  * List of events dispatched by this component
  * @enum {string}
  */
@@ -504,5 +537,13 @@ plana.ui.tags.TagsInput.EventType = {
    * @desc The event dispatched if the component does not allow a user to
    * create tags and the token entered does not match any existing tags
    */
-  INVALID: goog.events.getUniqueId('invalid')
+  INVALID: goog.events.getUniqueId('invalid'),
+  /**
+   * @desc The event dispatched after a tag was added
+   */
+  ADDED: goog.events.getUniqueId('added'),
+  /**
+   * @desc The event dispatched after a tag was removed
+   */
+  REMOVED: goog.events.getUniqueId('removed')
 };
