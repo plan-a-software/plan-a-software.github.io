@@ -403,7 +403,7 @@ plana.ui.ac.AutoComplete.prototype.setPlaceholder = function(label) {
  * @param {?Object} headers
  */
 plana.ui.ac.AutoComplete.prototype.setHeaders = function(headers) {
-  this.cachingMatcher.getRemoteMatcher().setHeaders(headers);
+  this.cachingMatcher.getRemoteMatcher().setRequestHeaders(headers);
 };
 
 /**
