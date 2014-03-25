@@ -604,7 +604,7 @@ plana.ui.ac.AutoComplete.prototype.onUpdate_ = function(e) {
       this.autoComplete.getRenderer().dismiss();
       break;
     default:
-      ;
+;
   }
 };
 
@@ -685,28 +685,37 @@ plana.ui.ac.AutoComplete.prototype.getModel = function() {
 plana.ui.ac.AutoComplete.prototype.getNonMatches = function() {
   if (this.inputHandler == null) return [];
 
-  var entries = this.inputHandler.getEntries();
-  var matches = this.inputHandler.getMatchedObjects();
+  var inputHandler = this.inputHandler;
+  var entries = inputHandler.getEntries();
+  var matches = inputHandler.getMatchedObjects();
   var filtered = goog.array.filter(entries, function(text, indx) {
     if (goog.string.isEmptySafe(text)) return false;
     text = goog.string.trim(text);
     for (var i = 0, match; match = matches[i]; ++i) {
-      if (goog.isString(match) && goog.string.trim(match) == text ||
-        (
-          goog.isDefAndNotNull(
-            match[plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY]
-          ) &&
-          goog.string.trim(
-            match[plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY]
-          ) == text
-        ) ||
-        (goog.string.trim(match.toString()) == text)) {
-        matches.splice(i, 1);
+      var remove = false;
+      if (goog.isString(match)) {
+        if (inputHandler.areStringsEqual(goog.string.trim(match), text))
+          remove = true;
+      } else {
+        var caption = match[plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY];
+        if (goog.isDefAndNotNull(caption)) {
+          caption = goog.string.trim(caption);
+          if (inputHandler.areStringsEqual(caption, text)) {
+            remove = true;
+          }
+        } else {
+          remove = inputHandler.areStringsEqual(
+            goog.string.trim(match.toString()),
+            text);
+        }
+      }
+      if (remove) {
         return false;
       }
     }
     return true;
   });
+  inputHandler = null;
   return goog.array.map(filtered, function(text, indx) {
     return goog.string.trim(text);
   });

@@ -406,7 +406,7 @@ plana.ui.ac.InputHandler.prototype.onKeyUp_ = function(e) {
               match = goog.string.trim(obj.toString());
               obj.dispose();
             }
-            if (!this.areStringsEqual_(token, match)) {
+            if (!this.areStringsEqual(token, match)) {
               this.matchedObjects_[index] = null;
             }
           }
@@ -473,7 +473,7 @@ plana.ui.ac.InputHandler.prototype.onBlur_ = function(e) {
  * @private
  */
 plana.ui.ac.InputHandler.prototype.onTick_ = function(e) {
-  if (!this.areStringsEqual_(this.previousValue_, this.input_.value)) {
+  if (!this.areStringsEqual(this.previousValue_, this.input_.value)) {
     this.sendChangeNotification_();
     this.previousValue_ = this.input_.value;
   }
@@ -513,9 +513,8 @@ plana.ui.ac.InputHandler.prototype.updateMatchedObject_ = function(
  * @param {!string} str1 The string to compare
  * @param {!string} str2 The string to compare str1 to
  * @return {boolean}
- * @private
  */
-plana.ui.ac.InputHandler.prototype.areStringsEqual_ = function(str1, str2) {
+plana.ui.ac.InputHandler.prototype.areStringsEqual = function(str1, str2) {
   if (this.caseInsensitve_ == false) {
     return str1 == str2;
   } else {
@@ -689,7 +688,7 @@ plana.ui.ac.InputHandler.prototype.selectRow = function(row) {
  * to set the token
  */
 plana.ui.ac.InputHandler.prototype.update = function(opt_force) {
-  if (!this.areStringsEqual_(this.previousValue_, this.input_.value) ||
+  if (!this.areStringsEqual(this.previousValue_, this.input_.value) ||
     opt_force) {
     this.sendChangeNotification_();
     this.previousValue_ = this.input_.value;
@@ -774,6 +773,14 @@ plana.ui.ac.InputHandler.prototype.setSeparatorSelects = function(newValue) {
  */
 plana.ui.ac.InputHandler.prototype.setCaseInsensitive = function(newValue) {
   this.caseInsensitve_ = newValue;
+};
+
+/**
+ * Getter for the flag whether this component handles strings case-insensitive
+ * @return {boolean}
+ */
+plana.ui.ac.InputHandler.prototype.getCaseInsensitive = function() {
+  return this.caseInsensitve_;
 };
 
 /**
