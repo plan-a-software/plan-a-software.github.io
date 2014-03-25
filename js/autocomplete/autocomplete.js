@@ -221,6 +221,15 @@ plana.ui.ac.AutoComplete.prototype.disposeInternal = function() {
   this.placeholder_ = null;
 };
 
+/**
+ * This component does not support decoration for now
+ * @param {Element} element Element to decorate
+ * @return {boolean} Return false
+ * @override
+ */
+plana.ui.ac.AutoComplete.prototype.canDecorate = function(element) {
+  return false;
+};
 
 /**
  * @override
