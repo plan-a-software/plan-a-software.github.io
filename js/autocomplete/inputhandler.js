@@ -197,6 +197,14 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
    */
   this.matchedObjects_ = [];
 
+  /**
+   * Flag whether we should be case-insenstive when
+   * checking for tokens against mapped objects
+   * @type {boolean}
+   * @private
+   */
+  this.caseInsensitve_ = false;
+
   //setup listeners
   this.eventHandler_.listen(this.keyHandler_,
     goog.events.KeyHandler.EventType.KEY,
@@ -271,6 +279,7 @@ plana.ui.ac.InputHandler.prototype.disposeInternal = function() {
 
   this.matchedObjects_.length = 0;
   this.matchedObjects_ = null;
+  this.caseInsensitve_ = null;
 };
 
 /**
@@ -397,7 +406,7 @@ plana.ui.ac.InputHandler.prototype.onKeyUp_ = function(e) {
               match = goog.string.trim(obj.toString());
               obj.dispose();
             }
-            if (token != match) {
+            if (!this.areStringsEqual_(token, match)) {
               this.matchedObjects_[index] = null;
             }
           }
@@ -464,7 +473,7 @@ plana.ui.ac.InputHandler.prototype.onBlur_ = function(e) {
  * @private
  */
 plana.ui.ac.InputHandler.prototype.onTick_ = function(e) {
-  if (this.previousValue_ != this.input_.value) {
+  if (!this.areStringsEqual_(this.previousValue_, this.input_.value)) {
     this.sendChangeNotification_();
     this.previousValue_ = this.input_.value;
   }
@@ -496,6 +505,22 @@ plana.ui.ac.InputHandler.prototype.updateMatchedObject_ = function(
     this.matchedObjects_[index] = null;
   } else
     this.matchedObjects_[index] = match.getData();
+};
+
+/**
+ * This function checks if two strings are equal with the current
+ * setting for case sensitive behaviour
+ * @param {!string} str1 The string to compare
+ * @param {!string} str2 The string to compare str1 to
+ * @return {boolean}
+ * @private
+ */
+plana.ui.ac.InputHandler.prototype.areStringsEqual_ = function(str1, str2) {
+  if (this.caseInsensitve_ == false) {
+    return str1 == str2;
+  } else {
+    return str1.toLowerCase() == str2.toLowerCase();
+  }
 };
 
 /**
@@ -664,7 +689,8 @@ plana.ui.ac.InputHandler.prototype.selectRow = function(row) {
  * to set the token
  */
 plana.ui.ac.InputHandler.prototype.update = function(opt_force) {
-  if (this.previousValue_ != this.input_.value || opt_force) {
+  if (!this.areStringsEqual_(this.previousValue_, this.input_.value) ||
+    opt_force) {
     this.sendChangeNotification_();
     this.previousValue_ = this.input_.value;
   }
@@ -739,6 +765,15 @@ plana.ui.ac.InputHandler.prototype.setSeparatorCompletes = function(newValue) {
  */
 plana.ui.ac.InputHandler.prototype.setSeparatorSelects = function(newValue) {
   this.separatorSelects_ = newValue;
+};
+
+/**
+ * This function sets whether string comparisons in this class are
+ * case-insensitive
+ * @param {boolean} newValue Whether we should ignore case for strings
+ */
+plana.ui.ac.InputHandler.prototype.setCaseInsensitive = function(newValue) {
+  this.caseInsensitve_ = newValue;
 };
 
 /**
