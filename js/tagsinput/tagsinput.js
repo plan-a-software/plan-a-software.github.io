@@ -124,7 +124,7 @@ plana.ui.tags.TagsInput.DEFAULT_TAG_CSS = 'label-info';
  * The placeholder message to display in the input. Set
  * to an empty string to disable placeholder text
  */
-plana.ui.tags.TagsInput.MSG_ADD_TAG_PLACEHOLDER = goog.getMsg('Add tags');
+plana.ui.tags.TagsInput.MSG_ADD_TAG_PLACEHOLDER = goog.getMsg('Add tag');
 
 /**
  * The default speed to use for the fade-in/out animations
