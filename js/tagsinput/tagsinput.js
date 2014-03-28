@@ -1,8 +1,18 @@
-/* Copyright (C) Plan-A Software Ltd - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Kiran Lakhotia <info@plan-a-software.co.uk>, 2014
- */
+// Copyright (C) Plan-A Software Ltd. All Rights Reserved.
+//
+// Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 'use strict';
 
 goog.provide('plana.ui.tags.TagsInput');
@@ -332,11 +342,8 @@ plana.ui.tags.TagsInput.prototype.onRemoveTag_ = function(e) {
     var btn = dom.getFirstElementChild(el);
     if (btn == e.target) {
       this.removeTag_(el, i);
-      tags.splice(i, 1);
-      this.dispatchEvent({
-        type: plana.ui.tags.TagsInput.EventType.REMOVED,
-        tag: dom.getTextContent(el)
-      });
+      var removed = tags.splice(i, 1);
+      this.onChange_(plana.ui.tags.TagsInput.EventType.REMOVED, removed[0]);
       break;
     }
   }
@@ -378,10 +385,7 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
   if (tags == null) {
     //this will render the tags
     this.setModel([e.data]);
-    this.dispatchEvent({
-      type: plana.ui.tags.TagsInput.EventType.ADDED,
-      tag: dom.getTextContent(this.tags_[this.tags_.length - 1])
-    });
+    this.onChange_(plana.ui.tags.TagsInput.EventType.ADDED, e.data);
   } else {
     var dom = this.dom_;
     var tagObj = new plana.ui.ac.RemoteObject(e.data);
@@ -410,10 +414,7 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
       var numTags = this.tags_.length;
       this.renderTag_(e.data, numTags);
       tags.push(e.data);
-      this.dispatchEvent({
-        type: plana.ui.tags.TagsInput.EventType.ADDED,
-        tag: dom.getTextContent(this.tags_[this.tags_.length - 1])
-      });
+      this.onChange_(plana.ui.tags.TagsInput.EventType.ADDED, e.data);
     } else {
       //fade out then back in
       var tag = this.tags_[duplicateIndex];
@@ -469,16 +470,31 @@ plana.ui.tags.TagsInput.prototype.onKey_ = function(e) {
         var index = numTags - 1;
         var tag = this.tags_[index];
         this.removeTag_(tag, index);
-        tags.splice(index, 1);
-        this.dispatchEvent({
-          type: plana.ui.tags.TagsInput.EventType.REMOVED,
-          tag: this.dom_.getTextContent(tag)
-        });
+        var removed = tags.splice(index, 1);
+        this.onChange_(plana.ui.tags.TagsInput.EventType.REMOVED, removed[0]);
         e.preventDefault();
         e.stopPropagation();
       }
     }
   }
+};
+
+/**
+ * This function dispatches change events for listeners
+ * @param {string} type The event that caused the change
+ * @param {string|Object} tag Tag information
+ * @private
+ */
+plana.ui.tags.TagsInput.prototype.onChange_ = function(type, tag) {
+  this.dispatchEvent({
+    type: type,
+    tag: tag
+  });
+  this.dispatchEvent(
+    new goog.events.Event(
+      goog.events.EventType.CHANGE, this
+    )
+  );
 };
 
 /**
