@@ -69,21 +69,21 @@ plana.ui.ac.AutoComplete = function(
   /**
    * Flag whether the input supports separators and thus
    * we need to store an array of selected matches
-   * @type {boolean}
+   * @type {?boolean}
    * @private
    */
   this.isArrayModel_ = opt_multi || false;
 
   /**
    * The id to use for the autocomplete input element
-   * @type {!string}
+   * @type {?string}
    * @private
    */
   this.inputId_ = opt_inputId || '';
 
   /**
    * Optional placeholder to show in the input textbox
-   * @type {string}
+   * @type {?string}
    * @private
    */
   this.placeholder_ = '';
@@ -92,7 +92,7 @@ plana.ui.ac.AutoComplete = function(
    * Custom renderer for this class. Its main job is to
    * attach custom classes to the container and its input
    * element
-   * @type {plana.ui.ac.AutoCompleteRenderer}
+   * @type {?plana.ui.ac.AutoCompleteRenderer}
    * @protected
    */
   this.componentRenderer = opt_renderer ||
@@ -101,7 +101,7 @@ plana.ui.ac.AutoComplete = function(
   /**
    * The matcher that combines a local cache of matches with
    * the remote matcher
-   * @type {plana.ui.ac.CachingMatcher}
+   * @type {?plana.ui.ac.CachingObjectMatcher}
    * @protected
    */
   this.cachingMatcher =
@@ -135,7 +135,7 @@ plana.ui.ac.AutoComplete = function(
    * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
    * Whether to prevent the default behavior (moving focus to another element)
    * when tab is pressed. This occurs by default only for multi-value mode.
-   * @type {boolean}
+   * @type {?boolean}
    * @private
    */
   this.preventDefaultOnTab_ = !! opt_multi;
@@ -150,7 +150,7 @@ plana.ui.ac.AutoComplete = function(
   /**
    * The image or text to display while we're fetching
    * matches from the server, e.g. a waiting animation
-   * @type {Element|string}
+   * @type {?(Element|string)}
    * @private
    */
   this.loadingContent_ = plana.ui.ac.AutoComplete.MSG_LOADING_DEFAULT;
@@ -165,7 +165,7 @@ plana.ui.ac.AutoComplete = function(
   /**
    * An optional message to display if the server did not find
    * any matches
-   * @type {?string}
+   * @type {?(Element|string)}
    * @private
    */
   this.noMatchMsg_ = plana.ui.ac.AutoComplete.MSG_NO_MATCHES_FOUND;
@@ -241,7 +241,8 @@ plana.ui.ac.AutoComplete.prototype.createDom = function() {
   var container = renderer.createDom(dom);
   this.setElementInternal(container);
 
-  var model = plana.ui.ac.AutoComplete.superClass_.getModel.call(this);
+  var model = /** @type {?Array.<Object|string>} */
+    (plana.ui.ac.AutoComplete.superClass_.getModel.call(this));
 
   var input = renderer.getInput(this, dom);
   input['placeholder'] = this.placeholder_;
@@ -290,7 +291,9 @@ plana.ui.ac.AutoComplete.prototype.createNoMatchDom_ = function() {
       this.noMatchesDom_.innerHTML = this.noMatchMsg_;
     else {
       dom.removeChildren(this.noMatchesDom_);
-      dom.appendChild(this.noMatchesDom_, this.noMatchMsg_);
+      dom.appendChild(this.noMatchesDom_,
+        /** @type {!Node}*/
+        (this.noMatchMsg_));
     }
   }
 };
@@ -333,13 +336,13 @@ plana.ui.ac.AutoComplete.prototype.enterDocument = function() {
     goog.ui.ac.AutoComplete.EventType.UPDATE,
     goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE,
     goog.ui.ac.AutoComplete.EventType.DISMISS
-  ], this.onUpdate_, false, this);
+  ], this.onUpdate_, false);
   handler.listen(this.inputHandler,
     goog.object.getValues(plana.ui.ac.InputHandler.EventType),
-    this.onInputEvent_, false, this);
+    this.onInputEvent_, false);
   handler.listen(this.inputHandler,
     goog.events.KeyHandler.EventType.KEY,
-    this.onKey, false, this);
+    this.onKey, false);
 };
 
 /**
@@ -351,13 +354,13 @@ plana.ui.ac.AutoComplete.prototype.exitDocument = function() {
     goog.ui.ac.AutoComplete.EventType.UPDATE,
     goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE,
     goog.ui.ac.AutoComplete.EventType.DISMISS
-  ], this.onUpdate_, false, this);
+  ], this.onUpdate_, false);
   handler.unlisten(this.inputHandler,
     goog.object.getValues(plana.ui.ac.InputHandler.EventType),
-    this.onInputEvent_, false, this);
+    this.onInputEvent_, false);
   handler.unlisten(this.inputHandler,
     goog.events.KeyHandler.EventType.KEY,
-    this.onKey, false, this);
+    this.onKey, false);
   plana.ui.ac.AutoComplete.superClass_.exitDocument.call(this);
 };
 
@@ -455,7 +458,7 @@ plana.ui.ac.AutoComplete.prototype.getInputHandler = function() {
 /**
  * This function returns the cached-based remote matcher used by this
  * component
- * @return {plana.ui.ac.CachingMatcher}
+ * @return {plana.ui.ac.CachingObjectMatcher}
  */
 plana.ui.ac.AutoComplete.prototype.getCachingMatcher = function() {
   return this.cachingMatcher;
@@ -463,7 +466,13 @@ plana.ui.ac.AutoComplete.prototype.getCachingMatcher = function() {
 
 /**
  * Callback for events dispatched by the inputhandler
- * @param {goog.events.Event} e The event dispatched by the
+ * @param {goog.events.Event|
+ * {
+ *  type: string,
+ *  target: plana.ui.ac.InputHandler,
+ *  token: string,
+ *  fullstring: string
+ * }} e The event dispatched by the
  *     input handler
  * @private
  */
@@ -613,7 +622,7 @@ plana.ui.ac.AutoComplete.prototype.onUpdate_ = function(e) {
       this.autoComplete.getRenderer().dismiss();
       break;
     default:
-;
+      ;
   }
 };
 
@@ -644,13 +653,15 @@ plana.ui.ac.AutoComplete.prototype.setPreventDefaultOnTab = function(newValue) {
 };
 
 /**
- * @param {?Array.<Object|string>} model The list of objects or string
+ * @param {*} model The list of objects or string
  *     with which to initialize the text input of the autocomplete
  *     input
  * @override
  */
 plana.ui.ac.AutoComplete.prototype.setModel = function(model) {
-  plana.ui.ac.AutoComplete.superClass_.setModel.call(this, model);
+  plana.ui.ac.AutoComplete.superClass_.setModel.call(this,
+    /** @type {?Array.<Object|string>} */
+    (model));
   var matches;
   if (model == null)
     matches = [];
@@ -677,7 +688,9 @@ plana.ui.ac.AutoComplete.prototype.getModel = function() {
       return matches[0];
     }
   }
-  return plana.ui.ac.AutoComplete.superClass_.getModel.call(this);
+  var model = /** @type {Object|string|null|Array.<Object|string>} */
+    (plana.ui.ac.AutoComplete.superClass_.getModel.call(this));
+  return model;
 };
 
 /**

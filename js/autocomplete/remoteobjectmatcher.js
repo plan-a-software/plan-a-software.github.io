@@ -76,7 +76,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
 
   /**
    * The class for performing ajax requests
-   * @type {goog.net.XhrIo}
+   * @type {?goog.net.XhrIo}
    * @protected
    */
   this.xhrIo = opt_xhrIo || new goog.net.XhrIo(opt_xmlHttpFactory);
@@ -84,7 +84,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
   /**
    * Boolean flag whether the request object
    * is ready to handle another request
-   * @type {boolean}
+   * @type {?boolean}
    * @protected
    */
   this.xhrIoReady = true;
@@ -99,7 +99,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
 
   /**
    * The type of request, i.e. 'GET' or 'POST'
-   * @type {string}
+   * @type {?string}
    * @private
    */
   this.xhrIoRequestType_ = 'GET';
@@ -107,7 +107,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
   /**
    * The event handler used by this class to listen to
    * ajax events
-   * @type {goog.events.EventHandler}
+   * @type {?goog.events.EventHandler}
    * @private
    */
   this.eventHandler_ = new goog.events.EventHandler(this);
@@ -115,7 +115,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
   //start listening to ajax events
   this.eventHandler_.listen(this.xhrIo,
     goog.object.getValues(goog.net.EventType),
-    this.onRequestCompleted, false, this);
+    this.onRequestCompleted, false);
 };
 goog.inherits(plana.ui.ac.RemoteObjectMatcher, goog.events.EventTarget);
 
@@ -293,7 +293,9 @@ plana.ui.ac.RemoteObjectMatcher.prototype.requestMatches = function(
   queryData.set(plana.ui.ac.RemoteObjectMatcher.FULL_STRING_PARA, fullstring);
 
   this.xhrIoReady = false;
-  this.xhrIo.send(this.uri.getPath(), this.xhrIoRequestType_,
+  this.xhrIo.send(this.uri.getPath(),
+    /**@type {string} */
+    (this.xhrIoRequestType_),
     queryData.toString(), this.xhrIoRequestHeaders_);
 };
 
@@ -321,9 +323,10 @@ plana.ui.ac.RemoteObjectMatcher.prototype.setRequestHeaders = function(
  */
 plana.ui.ac.RemoteObjectMatcher.prototype.setRequestType = function(
   requestType) {
-  goog.asserts.assert('request type must be get or post',
+  goog.asserts.assert(
     goog.string.caseInsensitiveCompare(requestType, 'get') == 0 ||
-    goog.string.caseInsensitiveCompare(requestType, 'post') == 0);
+    goog.string.caseInsensitiveCompare(requestType, 'post') == 0,
+    'request type must be get or post');
 
   this.xhrIoRequestType_ = requestType;
 };
@@ -366,13 +369,13 @@ plana.ui.ac.RemoteObjectMatcher.EventType = {
  * @param {string} type The event type
  * @param {plana.ui.ac.RemoteObjectMatcher} target The remote
  *     matcher instance that triggered the event
- * @param {Array.<plana.ui.ac.RemoteObject>=} opt_matches Optional
- *     array of matches
+ * @param {Array.<plana.ui.ac.RemoteObject>} matches Array of
+ *     matches
  * @param {number=} opt_total Optional number of total matches
  *     available on the server
  */
 plana.ui.ac.RemoteObjectMatcher.Event = function(
-  type, target, opt_matches, opt_total) {
+  type, target, matches, opt_total) {
   goog.events.Event.call(this, type, target);
 
   /**
@@ -384,10 +387,10 @@ plana.ui.ac.RemoteObjectMatcher.Event = function(
 
   /**
    * Optional array of matches
-   * @type {?Array.<plana.ui.ac.RemoteObject>}
+   * @type {Array.<plana.ui.ac.RemoteObject>}
    * @public
    */
-  this.matches = opt_matches || null;
+  this.matches = matches;
 };
 goog.inherits(plana.ui.ac.RemoteObjectMatcher.Event, goog.events.Event);
 
@@ -398,14 +401,14 @@ goog.inherits(plana.ui.ac.RemoteObjectMatcher.Event, goog.events.Event);
  * Otherwise the 'toString' method is used
  * @constructor
  * @extends {goog.Disposable}
- * @param {!Object} data The match object returned by the server
+ * @param {Object|string} data The match object returned by the server
  */
 plana.ui.ac.RemoteObject = function(data) {
   goog.Disposable.call(this);
 
   /**
    * A match object.
-   * @type {!Object}
+   * @type {?(Object|string)}
    * @private
    */
   this.data_ = data;
@@ -447,7 +450,7 @@ plana.ui.ac.RemoteObject.prototype.disposeInternal = function() {
 
 /**
  * Returns the match data
- * @return {!Object}
+ * @return {?(Object|string)}
  */
 plana.ui.ac.RemoteObject.prototype.getData = function() {
   return this.data_;

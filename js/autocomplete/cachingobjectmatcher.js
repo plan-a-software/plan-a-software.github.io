@@ -62,7 +62,7 @@ plana.ui.ac.CachingObjectMatcher = function(
 
   /**
    * The client side cache
-   * @type {!Array.<!plana.ui.ac.RemoteObject>}}
+   * @type {?Array.<!plana.ui.ac.RemoteObject>}}
    * @private
    */
   this.rows_ = [];
@@ -71,7 +71,7 @@ plana.ui.ac.CachingObjectMatcher = function(
    * Set of stringified rows, for fast deduping. Each element of this.rows_
    * is stored in rowStrings_ as (' ' + row) to ensure we avoid builtin
    * properties like 'toString'
-   * @type {Object.<string, boolean>}
+   * @type {?Object.<string, boolean>}
    * @private
    */
   this.rowStrings_ = {};
@@ -79,14 +79,14 @@ plana.ui.ac.CachingObjectMatcher = function(
   /**
    * Maximum number of rows in the cache. If the cache grows larger than this,
    * the entire cache will be emptied
-   * @type {number}
+   * @type {?number}
    * @private
    */
   this.maxCacheSize_ = 1000;
 
   /**
    * The remote object matcher
-   * @type {plana.ui.ac.RemoteObjectMatcher}
+   * @type {?plana.ui.ac.RemoteObjectMatcher}
    * @private
    */
   this.remoteMatcher_ =
@@ -96,7 +96,7 @@ plana.ui.ac.CachingObjectMatcher = function(
   /**
    * Number of matches to request from the remote
    * matcher
-   * @type {number}
+   * @type {?number}
    * @private
    */
   this.remoteMatcherMaxMatches_ = 100;
@@ -104,7 +104,7 @@ plana.ui.ac.CachingObjectMatcher = function(
   /**
    * The timer to control how often remote requests are
    * submitted to the server in response to key events
-   * @type {goog.async.Throttle}
+   * @type {?goog.async.Throttle}
    * @private
    */
   this.throttledTriggerBaseMatch_ =
@@ -112,7 +112,7 @@ plana.ui.ac.CachingObjectMatcher = function(
 
   /**
    * The request token to use for the remote matcher
-   * @type {string}
+   * @type {?string}
    * @private
    */
   this.mostRecentToken_ = '';
@@ -120,7 +120,7 @@ plana.ui.ac.CachingObjectMatcher = function(
   /**
    * The complete input string, including the token.
    * This is useful for inputs that allow multiple entries
-   * @type {string}
+   * @type {?string}
    * @private
    */
   this.mostRecentString_ = '';
@@ -136,7 +136,7 @@ plana.ui.ac.CachingObjectMatcher = function(
   /**
    * The maximum number of matches to return from
    * local cache
-   * @type {number}
+   * @type {?number}
    * @private
    */
   this.cacheMaxMatches_ = 10;
@@ -152,21 +152,21 @@ plana.ui.ac.CachingObjectMatcher = function(
    * We need to keep track of the last rows we displayed, because the "similar
    * matcher" we use locally might otherwise reorder results
    *
-   * @type {Array.<!plana.ui.ac.RemoteObject>}
+   * @type {?Array.<!plana.ui.ac.RemoteObject>}
    * @private
    */
   this.mostRecentMatches_ = [];
 
   /**
    * The state of the cache manager and its base matcher
-   * @type {!number}
+   * @type {?number}
    * @private
    */
   this.currentState_ = plana.ui.ac.CachingObjectMatcher.State.READY;
 
   /**
    * Flag whether we should add matches to the local cache or not
-   * @type {boolean}
+   * @type {?boolean}
    * @private
    */
   this.disableLocalCache_ = false;
@@ -176,7 +176,7 @@ plana.ui.ac.CachingObjectMatcher = function(
     plana.ui.ac.RemoteObjectMatcher.EventType.FAILED_REQUEST,
     plana.ui.ac.RemoteObjectMatcher.EventType.MATCHES,
     plana.ui.ac.RemoteObjectMatcher.EventType.INVALID_RESPONSE
-  ], this.onRemoteMatcherEvent_, false, this);
+  ], this.onRemoteMatcherEvent_, false);
 };
 goog.inherits(plana.ui.ac.CachingObjectMatcher, goog.events.EventHandler);
 
@@ -188,7 +188,7 @@ plana.ui.ac.CachingObjectMatcher.prototype.disposeInternal = function() {
     plana.ui.ac.RemoteObjectMatcher.EventType.FAILED_REQUEST,
     plana.ui.ac.RemoteObjectMatcher.EventType.MATCHES,
     plana.ui.ac.RemoteObjectMatcher.EventType.INVALID_RESPONSE
-  ], this.onRemoteMatcherEvent_, false, this);
+  ], this.onRemoteMatcherEvent_, false);
 
   for (var i = 0, match; match = this.rows_[i]; ++i) {
     match.dispose();
@@ -424,7 +424,7 @@ plana.ui.ac.CachingObjectMatcher.prototype.requestMatchingRows =
 /**
  * This function is taken from {@link goog.ui.ac.CachingMatcher}.
  * Adds the specified rows to the cache
- * @param {!Array.<!plana.ui.ac.RemoteObject>} rows
+ * @param {Array.<plana.ui.ac.RemoteObject>} rows
  * @private
  */
 plana.ui.ac.CachingObjectMatcher.prototype.addRowsToCache_ = function(rows) {
@@ -461,9 +461,12 @@ plana.ui.ac.CachingObjectMatcher.prototype.clearCacheIfTooLarge_ = function() {
  */
 plana.ui.ac.CachingObjectMatcher.prototype.triggerBaseMatch_ = function() {
   this.remoteMatcher_.requestMatches(
-    this.mostRecentToken_,
-    this.remoteMatcherMaxMatches_,
-    this.mostRecentString_);
+    /**@type {string} */
+    (this.mostRecentToken_),
+    /**@type {number} */
+    (this.remoteMatcherMaxMatches_),
+    /**@type {string} */
+    (this.mostRecentString_));
 };
 
 /**
@@ -502,8 +505,10 @@ plana.ui.ac.CachingObjectMatcher.prototype.onRemoteMatcherEvent_ = function(e) {
       slice(0, this.cacheMaxMatches_);
 
       var fetched = this.shouldRequestMatches(
-        this.mostRecentToken_,
-        this.mostRecentString_);
+        /**@type {string} */
+        (this.mostRecentToken_),
+        /**@type {string} */
+        (this.mostRecentString_));
       if (fetched &&
         this.mostRecentMatches_.length == 0)
         this.currentState_ = plana.ui.ac.CachingObjectMatcher.State.NO_MATCH;
@@ -535,7 +540,7 @@ plana.ui.ac.CachingObjectMatcher.prototype.onRemoteMatcherEvent_ = function(e) {
 /**
  * This function returns the current state of the cache manager
  * and its base matcher
- * @return {!number}
+ * @return {?number}
  */
 plana.ui.ac.CachingObjectMatcher.prototype.getState = function() {
   return this.currentState_;
@@ -544,7 +549,7 @@ plana.ui.ac.CachingObjectMatcher.prototype.getState = function() {
 /**
  * This function returns the matcher used to fetch matches via
  * ajax
- * @return {!plana.ui.ac.RemoteObjectMatcher}
+ * @return {?plana.ui.ac.RemoteObjectMatcher}
  */
 plana.ui.ac.CachingObjectMatcher.prototype.getRemoteMatcher = function() {
   return this.remoteMatcher_;
