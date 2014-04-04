@@ -70,14 +70,14 @@ plana.ui.ts.TypeaheadSearch = function(
   /**
    * Flag whether we only search if the token changed
    * from the previous token used to search
-   * @type {boolean}
+   * @type {?boolean}
    * @private
    */
   this.forceUniqueTokenSearch_ = true;
 
   /**
    * Flag whether we're currently doing a fulltext search
-   * @type {boolean}
+   * @type {?boolean}
    * @private
    */
   this.searching_ = false;
@@ -111,7 +111,7 @@ plana.ui.ts.TypeaheadSearch.prototype.enterDocument = function() {
   var renderer = this.componentRenderer;
   var handler = this.getHandler();
   handler.listen(renderer.getSearchButton(this, this.dom_),
-    goog.events.EventType.CLICK, this.onSearch_, false, this);
+    goog.events.EventType.CLICK, this.onSearch_, false);
 };
 
 
@@ -122,14 +122,14 @@ plana.ui.ts.TypeaheadSearch.prototype.exitDocument = function() {
   var renderer = this.getRenderer();
   var handler = this.getHandler();
   handler.unlisten(renderer.getSearchButton(this, this.dom_),
-    goog.events.EventType.CLICK, this.onSearch_, false, this);
+    goog.events.EventType.CLICK, this.onSearch_, false);
   if (this.searching_) {
     var remoteMatcher = this.cachingMatcher.getRemoteMatcher();
     handler.unlisten(remoteMatcher, [
       plana.ui.ac.RemoteObjectMatcher.EventType.FAILED_REQUEST,
       plana.ui.ac.RemoteObjectMatcher.EventType.MATCHES,
       plana.ui.ac.RemoteObjectMatcher.EventType.INVALID_RESPONSE
-    ], this.onMatches_, false, this);
+    ], this.onMatches_, false);
   }
   plana.ui.ts.TypeaheadSearch.superClass_.exitDocument.call(this);
 };
@@ -151,7 +151,7 @@ plana.ui.ts.TypeaheadSearch.prototype.onMatches_ = function(e) {
     plana.ui.ac.RemoteObjectMatcher.EventType.FAILED_REQUEST,
     plana.ui.ac.RemoteObjectMatcher.EventType.MATCHES,
     plana.ui.ac.RemoteObjectMatcher.EventType.INVALID_RESPONSE
-  ], this.onMatches_, false, this);
+  ], this.onMatches_, false);
 
   this.cachingMatcher.disableLocalCache(false);
 
@@ -224,7 +224,7 @@ plana.ui.ts.TypeaheadSearch.prototype.onSearch_ = function(e) {
       plana.ui.ac.RemoteObjectMatcher.EventType.FAILED_REQUEST,
       plana.ui.ac.RemoteObjectMatcher.EventType.MATCHES,
       plana.ui.ac.RemoteObjectMatcher.EventType.INVALID_RESPONSE
-    ], this.onMatches_, false, this);
+    ], this.onMatches_, false);
     remoteMatcher.requestMatches('', -1, token);
   }
 };
