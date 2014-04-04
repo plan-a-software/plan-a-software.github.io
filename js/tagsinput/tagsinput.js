@@ -62,7 +62,7 @@ plana.ui.tags.TagsInput = function(
 
   /**
    * The autocomplete to create new tags
-   * @type {plana.ui.ac.AutoComplete}
+   * @type {?plana.ui.ac.AutoComplete}
    * @private
    */
   this.autocomplete_ = new plana.ui.ac.AutoComplete(uri, false,
@@ -72,14 +72,14 @@ plana.ui.tags.TagsInput = function(
   /**
    * The div element containing the tags and the autocomplete
    * input
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.tagsContainer_ = null;
 
   /**
    * Array of displayed tag elements
-   * @type {Array.<Element>}
+   * @type {?Array.<Element>}
    * @private
    */
   this.tags_ = [];
@@ -87,28 +87,28 @@ plana.ui.tags.TagsInput = function(
   /**
    * Flag whether we should be case insensitive when checking
    * if a tag exists already
-   * @type {boolean}
+   * @type {?boolean}
    * @private
    */
   this.caseInsensitive_ = true;
 
   /**
    * The default width to use for the autocomplete input
-   * @type {number}
+   * @type {?number}
    * @private
    */
   this.inputSize_ = 8;
 
   /**
    * The fade in effect to use for duplicate tags
-   * @type {goog.fx.dom.FadeIn}
+   * @type {?goog.fx.dom.FadeIn}
    * @private
    */
   this.duplicateFadeInFx_ = null;
 
   /**
    * The fade out effect to use for duplicate tags
-   * @type {goog.fx.dom.FadeOut}
+   * @type {?goog.fx.dom.FadeOut}
    * @private
    */
   this.duplicateFadeOutFx_ = null;
@@ -116,7 +116,7 @@ plana.ui.tags.TagsInput = function(
   /**
    * Flag whether the user is allowed to create tags if
    * the autocomplete didn't find a match
-   * @type {boolean}
+   * @type {?boolean}
    * @private
    */
   this.allowCreateTags_ = opt_createNew || false;
@@ -213,7 +213,7 @@ plana.ui.tags.TagsInput.prototype.enterDocument = function() {
     this.onCheckAddTag_, false);
   handler.listen(this.autocomplete_.getInputHandler(),
     goog.events.KeyHandler.EventType.KEY,
-    this.onKey_, false, this);
+    this.onKey_, false);
 };
 
 /**
@@ -226,21 +226,23 @@ plana.ui.tags.TagsInput.prototype.exitDocument = function() {
     this.onCheckAddTag_, false);
   handler.unlisten(this.autocomplete_.getInputHandler(),
     goog.events.KeyHandler.EventType.KEY,
-    this.onKey_, false, this);
+    this.onKey_, false);
   plana.ui.tags.TagsInput.superClass_.exitDocument.call(this);
 };
 
 /**
- * @param {?Array.<string|Object>} model A tag list or null to
+ * @param {*} model A tag list or null to
  *     clear all tags
  * @override
  */
 plana.ui.tags.TagsInput.prototype.setModel = function(model) {
-  var old = this.getModel();
+  var old = /**@type {?Array.<string|Object>} */ (this.getModel());
   if (old != null) {
     old.length = 0;
   }
-  plana.ui.tags.TagsInput.superClass_.setModel.call(this, model);
+  plana.ui.tags.TagsInput.superClass_.setModel.call(this,
+    /**@type {?Array.<string|Object>} */
+    (model));
 
   if (this.tagsContainer_ != null) {
     this.renderTags_();
@@ -274,7 +276,7 @@ plana.ui.tags.TagsInput.prototype.removeTag_ = function(tag, index) {
   var handler = this.getHandler();
   var btn = dom.getFirstElementChild(tag);
   handler.unlisten(btn, goog.events.EventType.CLICK,
-    this.onRemoveTag_, false, this);
+    this.onRemoveTag_, false);
   dom.removeNode(tag);
   this.tags_[index] = null;
   this.tags_.splice(index, 1);
@@ -295,7 +297,7 @@ plana.ui.tags.TagsInput.prototype.renderTag_ = function(tag, index) {
   });
   var handler = this.getHandler();
   handler.listen(removeBtn, goog.events.EventType.CLICK,
-    this.onRemoveTag_, false, this);
+    this.onRemoveTag_, false);
 
   var css;
   if (goog.isString(tag) || !goog.isDefAndNotNull(tag['tagClass'])) {
@@ -321,7 +323,7 @@ plana.ui.tags.TagsInput.prototype.renderTags_ = function() {
   var handler = this.getHandler();
   this.removeTags_();
 
-  var tags = /** @type {?Array.<string|Object>} */ this.getModel();
+  var tags = /** @type {?Array.<string|Object>} */ (this.getModel());
   if (tags == null) return;
 
   for (var i = 0, tag; tag = tags[i]; ++i) {
@@ -335,7 +337,7 @@ plana.ui.tags.TagsInput.prototype.renderTags_ = function() {
  * @private
  */
 plana.ui.tags.TagsInput.prototype.onRemoveTag_ = function(e) {
-  var tags = /** @type {Array.<string|Object>} */ this.getModel();
+  var tags = /** @type {Array.<string|Object>} */ (this.getModel());
   goog.asserts.assert(tags != null, 'model cannot be null when removing tags');
   var dom = this.dom_;
   for (var i = 0, el; el = this.tags_[i]; ++i) {
@@ -381,7 +383,7 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
   }
 
   //add tag to model
-  var tags = /** @type {?Array.<string|Object>} */ this.getModel();
+  var tags = /** @type {?Array.<string|Object>} */ (this.getModel());
   if (tags == null) {
     //this will render the tags
     this.setModel([e.data]);
@@ -436,12 +438,12 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
           this.duplicateFadeInFx_.play();
           this.duplicateFadeOutFx_.dispose();
           this.duplicateFadeOutFx_ = null;
-        }, false, this);
+        }, false);
       handler.listenOnce(this.duplicateFadeInFx_,
         goog.fx.Animation.EventType.END, function(e) {
           this.duplicateFadeInFx_.dispose();
           this.duplicateFadeInFx_ = null;
-        }, false, this);
+        }, false);
       this.duplicateFadeOutFx_.play();
     }
   }
@@ -464,7 +466,7 @@ plana.ui.tags.TagsInput.prototype.onKey_ = function(e) {
       //delete
       var numTags = this.tags_.length;
       if (numTags > 0) {
-        var tags = /** @type {Array.<string|Object>} */ this.getModel();
+        var tags = /** @type {Array.<string|Object>} */ (this.getModel());
         goog.asserts.assert(tags != null,
           'model cannot be null when removing tags via backspace');
         var index = numTags - 1;
