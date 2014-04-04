@@ -806,16 +806,18 @@ plana.ui.BootstrapDialog.prototype.setDisposeOnHide = function(b) {
  * the dialog is rendered. A user can either add an existing button element,
  * or a {key: string, caption: string} object that will be rendered as button
  * @param {Element|Object} button The button to add
- * @param {boolean} isDefault Whether the button is the default button. Results
- *     in css class 'btn-primary' if the button parameter is not an existing
- *     HTML element
- * @param {boolean} isCancel Whether this is a cancel button
+ * @param {boolean=} opt_isDefault Whether the button is the default button.
+ *     Results in css class 'btn-primary' if the button parameter is not an
+ *     existing HTML element
+ * @param {boolean=} opt_isCancel Whether this is a cancel button
  * @param {string=} opt_css Optional css class to use for the button in case
  *     the button parameter is not an existing HTML element
  */
 plana.ui.BootstrapDialog.prototype.addButton = function(
-  button, isDefault, isCancel, opt_css) {
+  button, opt_isDefault, opt_isCancel, opt_css) {
   goog.asserts.assert(button != null, 'button cannot be null');
+  var isDefault = opt_isDefault || false;
+  var isCancel = opt_isCancel || false;
   /**
    * @type {!Element}
    */
