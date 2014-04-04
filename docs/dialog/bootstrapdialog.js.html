@@ -69,21 +69,21 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
 
   /**
    * The header element
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.headerEl_ = null;
 
   /**
    * The dialog close button
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.closeBtn_ = null;
 
   /**
    * The dialog title element
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.titleEl_ = null;
@@ -91,49 +91,49 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * The dialog content element
    * (contains header, body, footere)
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.contentEl_ = null;
 
   /**
    * The dialog body element
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.bodyEl_ = null;
 
   /**
    * The dialog footer element
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.footerEl_ = null;
 
   /**
    * The title text or HTML
-   * @type {string|Element}
+   * @type {?(string|Element)}
    * @private
    */
   this.title_ = null;
 
   /**
    * The body text or HTML
-   * @type {string|Element|goog.html.SafeHtml}
+   * @type {?(string|Element|goog.html.SafeHtml)}
    * @private
    */
   this.bodyContent_ = null;
 
   /**
    * The footer text or HTML
-   * @type {string|Element}
+   * @type {?(string|Element)}
    * @private
    */
   this.footer_ = null;
 
   /**
    * The container element for buttons
-   * @type {Element}
+   * @type {?Element}
    * @private
    */
   this.buttonEl_ = null;
@@ -141,14 +141,14 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * Flag whether we should dispose the dialog
    * on hiding
-   * @type {Boolean}
+   * @type {?boolean}
    * @private
    */
   this.disposeOnHide_ = false;
 
   /**
    * The dialog's preferred ARIA role
-   * @type {goog.a11y.aria.Role}
+   * @type {?goog.a11y.aria.Role}
    * @private
    */
   this.preferredAriaRole_ = goog.a11y.aria.Role.DIALOG;
@@ -156,7 +156,7 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * Flag whether the escape key dismisses
    * the dialog
-   * @type {Boolean}
+   * @type {?boolean}
    * @private
    */
   this.escapeToCancel_ = true;
@@ -164,14 +164,14 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * The array of action buttons. They will be
    * rendered in the order they are added
-   * @type {Array.&lt;Element>}
+   * @type {?Array.&lt;Element>}
    * @private
    */
   this.actionButtons_ = [];
 
   /**
    * Viewportsize monitor
-   * @type {goog.dom.ViewportSizeMonitor}
+   * @type {?goog.dom.ViewportSizeMonitor}
    * @private
    */
   this.vm_ = new goog.dom.ViewportSizeMonitor();
@@ -266,8 +266,10 @@ plana.ui.BootstrapDialog.prototype.createDom = function() {
   //add buttons
   dom.append(this.buttonEl_, this.actionButtons_);
 
-  goog.a11y.aria.setRole(root, this.getPreferredAriaRole());
-  goog.a11y.aria.setState(root, goog.a11y.aria.State.LABELLEDBY, '');
+  goog.a11y.aria.setRole( /**@type {!Element}*/ (root),
+    this.getPreferredAriaRole());
+  goog.a11y.aria.setState( /**@type {!Element}*/ (root),
+    goog.a11y.aria.State.LABELLEDBY, '');
 
   if (this.title_ != null)
     this.setTitle(this.title_);
@@ -326,7 +328,8 @@ plana.ui.BootstrapDialog.prototype.decorateInternal = function(element) {
     'modal-title', this.contentEl_);
   if (title.length > 0) {
     var titleEl = title[0];
-    goog.a11y.aria.setState(element, goog.a11y.aria.State.LABELLEDBY,
+    goog.a11y.aria.setState( /**@type {!Element}*/ (element),
+      goog.a11y.aria.State.LABELLEDBY,
       titleEl['id'] || '');
   }
 
@@ -357,19 +360,19 @@ plana.ui.BootstrapDialog.prototype.enterDocument = function() {
 
   if (this.closeBtn_)
     handler.listen(this.closeBtn_, goog.events.EventType.CLICK,
-      this.onClose_, false, this);
+      this.onClose_, false);
   // Listen for keyboard events while the dialog is visible
   handler.listen(modal, goog.events.EventType.KEYDOWN,
-    this.onKey_, false, this);
+    this.onKey_, false);
   handler.listen(modal, goog.events.EventType.KEYPRESS,
-    this.onKey_, false, this);
+    this.onKey_, false);
 
   handler.listen(this.vm_, goog.events.EventType.RESIZE,
-    this.onResize_, false, this);
+    this.onResize, false);
 
   for (var i = 0, btn; btn = this.actionButtons_[i]; ++i) {
     handler.listen(btn, goog.events.EventType.CLICK,
-      this.onButtonClick_, false, this);
+      this.onButtonClick_, false);
   }
 };
 
@@ -382,17 +385,17 @@ plana.ui.BootstrapDialog.prototype.exitDocument = function() {
   var modal = this.getElement();
   if (this.closeBtn_)
     handler.unlisten(this.closeBtn_, goog.events.EventType.CLICK,
-      this.onClose_, false, this);
+      this.onClose_, false);
   handler.unlisten(modal, goog.events.EventType.KEYDOWN,
-    this.onKey_, false, this);
+    this.onKey_, false);
   handler.unlisten(modal, goog.events.EventType.KEYPRESS,
-    this.onKey_, false, this);
+    this.onKey_, false);
 
   handler.unlisten(this.vm_, goog.events.EventType.RESIZE,
-    this.onResize_, false, this);
+    this.onResize, false);
   for (var i = 0, btn; btn = this.actionButtons_[i]; ++i) {
     handler.unlisten(btn, goog.events.EventType.CLICK,
-      this.onButtonClick_, false, this);
+      this.onButtonClick_, false);
   }
 };
 
@@ -414,7 +417,7 @@ plana.ui.BootstrapDialog.prototype.onResize = function(e) {
  * @private
  */
 plana.ui.BootstrapDialog.prototype.onButtonClick_ = function(e) {
-  var btn = e.target;
+  var btn = /**@type {!Node}*/ (e.target);
   var caption = this.dom_.getTextContent(btn);
   var key = this.getButtonKey_(btn);
 
@@ -432,7 +435,7 @@ plana.ui.BootstrapDialog.prototype.onButtonClick_ = function(e) {
 /**
  * This function returns the key associated with a button. We first
  * check the name of a button, if that's not set, we check the id
- * @param {Element} btn The button whose key to return
+ * @param {!Node} btn The button whose key to return
  * @return {!string} The button key
  * @private
  */
@@ -735,7 +738,8 @@ plana.ui.BootstrapDialog.prototype.getBodyContentAsString = function() {
  * @return {goog.a11y.aria.Role} This dialog's preferred ARIA role
  */
 plana.ui.BootstrapDialog.prototype.getPreferredAriaRole = function() {
-  return this.preferredAriaRole_;
+  var role = /**@type {goog.a11y.aria.Role}*/ (this.preferredAriaRole_);
+  return role;
 };
 
 /**
@@ -839,6 +843,10 @@ plana.ui.BootstrapDialog.prototype.setDisposeOnHide = function(b) {
 plana.ui.BootstrapDialog.prototype.addButton = function(
   button, isDefault, isCancel, opt_css) {
   goog.asserts.assert(button != null, 'button cannot be null');
+  /**
+   * @type {!Element}
+   */
+  var buttonEl;
   var dom = this.dom_;
   if (!button['tagName']) {
     var css;
@@ -847,19 +855,21 @@ plana.ui.BootstrapDialog.prototype.addButton = function(
     } else {
       css = opt_css ? opt_css : 'btn-default';
     }
-    button = dom.createDom('button', {
+    buttonEl = dom.createDom('button', {
       'type': 'button',
       'class': 'btn ' + css,
       'name': button.key
     }, dom.createTextNode(button.caption));
+  } else {
+    buttonEl = /**@type {!Element}*/ (button);
   }
   if (isCancel)
-    goog.dom.dataset.set(button, 'dismiss', this.getCssClass());
+    goog.dom.dataset.set(buttonEl, 'dismiss', this.getCssClass());
   if (isDefault)
-    goog.dom.dataset.set(button, 'role', 'default');
-  this.actionButtons_.push(button);
+    goog.dom.dataset.set(buttonEl, 'role', 'default');
+  this.actionButtons_.push(buttonEl);
   if (this.buttonEl_)
-    dom.appendChild(this.buttonEl_, button);
+    dom.appendChild(this.buttonEl_, buttonEl);
 };
 
 /**
@@ -891,7 +901,7 @@ plana.ui.BootstrapDialog.prototype.getButton = function(key) {
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri Apr 04 2014 12:17:12 GMT+0100 (BST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri Apr 04 2014 12:34:37 GMT+0100 (BST)
 </footer>
 
 <script> prettyPrint(); </script>
