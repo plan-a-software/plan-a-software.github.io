@@ -120,7 +120,7 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   this.disposeOnHide_ = false;
 
   /**
-   * The dialog's preferred ARIA role.
+   * The dialog's preferred ARIA role
    * @type {goog.a11y.aria.Role}
    * @private
    */
@@ -184,8 +184,8 @@ plana.ui.BootstrapDialog.prototype.getCssClass = function() {
 
 /**
  * Yes we can!
- * @param {Element} element Element to decorate.
- * @return {boolean} True if the element can be decorated, false otherwise.
+ * @param {Element} element Element to decorate
+ * @return {boolean} True if the element can be decorated, false otherwise
  * @override
  */
 plana.ui.BootstrapDialog.prototype.canDecorate = function(element) {
@@ -255,12 +255,12 @@ plana.ui.BootstrapDialog.prototype.createDom = function() {
  * document, the enterDocument method will be called.
  *
  * Any buttons *must* be inside a 'modal-footer' element, otherwise they
- * are not added to the set of handled buttons.
+ * are not added to the set of handled buttons
  *
- * A cancel button must have 'data-role' == 'cancel' and the default button
- * must use the css class 'btn-primary'
+ * A cancel button must have 'data-dismiss' attribute and the default button
+ * a 'data-role' attribute set to the value 'default'
  *
- * @param {Element} element Element to decorate.
+ * @param {Element} element Element to decorate
  * @override
  */
 plana.ui.BootstrapDialog.prototype.decorateInternal = function(element) {
@@ -331,7 +331,7 @@ plana.ui.BootstrapDialog.prototype.enterDocument = function() {
   if (this.closeBtn_)
     handler.listen(this.closeBtn_, goog.events.EventType.CLICK,
       this.onClose_, false, this);
-  // Listen for keyboard events while the dialog is visible.
+  // Listen for keyboard events while the dialog is visible
   handler.listen(modal, goog.events.EventType.KEYDOWN,
     this.onKey_, false, this);
   handler.listen(modal, goog.events.EventType.KEYPRESS,
@@ -383,7 +383,7 @@ plana.ui.BootstrapDialog.prototype.onResize = function(e) {
  * Handles buttons clicks. If the cancel button is clicked, this closes
  * the dialog. Otherwise it fires a button event and lets the user
  * decide what to do
- * @param {goog.events.BrowserEvent} e Browser's event object.
+ * @param {goog.events.BrowserEvent} e Browser's event object
  * @private
  */
 plana.ui.BootstrapDialog.prototype.onButtonClick_ = function(e) {
@@ -449,8 +449,8 @@ plana.ui.BootstrapDialog.prototype.getDefaultButton_ = function() {
 /**
  * Handles keydown and keypress events, and dismisses the popup if cancel is
  * pressed.  If there is a cancel action in the ButtonSet, than that will be
- * fired.  Also prevents tabbing out of the dialog.
- * @param {goog.events.BrowserEvent} e Browser's event object.
+ * fired.  Also prevents tabbing out of the dialog
+ * @param {goog.events.BrowserEvent} e Browser's event object
  * @private
  */
 plana.ui.BootstrapDialog.prototype.onKey_ = function(e) {
@@ -460,12 +460,12 @@ plana.ui.BootstrapDialog.prototype.onKey_ = function(e) {
   var target = e.target;
 
   if (e.type == goog.events.EventType.KEYDOWN) {
-    // Escape and tab can only properly be handled in keydown handlers.
+    // Escape and tab can only properly be handled in keydown handlers
     if (this.escapeToCancel_ && e.keyCode == goog.events.KeyCodes.ESC) {
-      // Only if there is a valid cancel button is an event dispatched.
+      // Only if there is a valid cancel button is an event dispatched
       var cancel = this.getCancelButton_();
 
-      // Users may expect to hit escape on a SELECT element.
+      // Users may expect to hit escape on a SELECT element
       var isSpecialFormElement =
         target.tagName == 'SELECT' && !target.disabled;
 
@@ -483,26 +483,26 @@ plana.ui.BootstrapDialog.prototype.onKey_ = function(e) {
       }
     } else if (e.keyCode == goog.events.KeyCodes.TAB && e.shiftKey &&
       target == this.getElement()) {
-      // Prevent the user from shift-tabbing backwards out of the dialog box.
-      // Instead, set up a wrap in focus backward to the end of the dialog.
+      // Prevent the user from shift-tabbing backwards out of the dialog box
+      // Instead, set up a wrap in focus backward to the end of the dialog
       this.setupBackwardTabWrap();
     }
   } else if (e.keyCode == goog.events.KeyCodes.ENTER) {
     // Only handle ENTER in keypress events, in case the action opens a
-    // popup window.
+    // popup window
     var key, caption, btnTarget;
     if (target.tagName == 'BUTTON' && !target.disabled) {
       // If the target is a button and it's enabled, we can fire that button's
-      // handler.
+      // handler
       key = target.name;
       caption = this.dom_.getTextContent(target);
       btnTarget = target;
     } else if (hasButtons) {
       // Try to fire the default button's handler (if one exists), but only if
-      // the button is enabled.
+      // the button is enabled
       var defaultButton = this.getDefaultButton_();
 
-      // Users may expect to hit enter on a TEXTAREA, SELECT or an A element.
+      // Users may expect to hit enter on a TEXTAREA, SELECT or an A element
       var isSpecialFormElement =
         (target.tagName == 'TEXTAREA' || target.tagName == 'SELECT' ||
         target.tagName == 'A') && !target.disabled;
@@ -579,8 +579,8 @@ plana.ui.BootstrapDialog.prototype.setBodyContent = function(body) {
 };
 
 /**
- * Allows arbitrary HTML to be set in the content element.
- * @param {!goog.html.SafeHtml} html Content HTML.
+ * Allows arbitrary HTML to be set in the content element
+ * @param {!goog.html.SafeHtml} html Content HTML
  */
 plana.ui.BootstrapDialog.prototype.setSafeHtmlContent = function(html) {
   this.bodyContent_ = html;
@@ -645,12 +645,12 @@ plana.ui.BootstrapDialog.prototype.setVisible = function(visible) {
 };
 
 /**
- * Focuses the dialog contents and the default dialog button if there is one.
+ * Focuses the dialog contents and the default dialog button if there is one
  * @override
  */
 plana.ui.BootstrapDialog.prototype.focus = function() {
   plana.ui.BootstrapDialog.superClass_.focus.call(this);
-  // Move focus to the default button (if any).
+  // Move focus to the default button (if any)
   if (this.actionButtons_.length > 0) {
     var defaultButton = this.getDefaultButton_();
     if (defaultButton && !defaultButton.disabled) {
@@ -658,7 +658,7 @@ plana.ui.BootstrapDialog.prototype.focus = function() {
       try {
         // Reopening a dialog can cause focusing the button to fail in
         // WebKit and Opera. Shift the focus to a temporary <input>
-        // element to make refocusing the button possible.
+        // element to make refocusing the button possible
         if (goog.userAgent.WEBKIT || goog.userAgent.OPERA) {
           var temp = doc.createElement('input');
           temp.style.cssText =
@@ -670,7 +670,7 @@ plana.ui.BootstrapDialog.prototype.focus = function() {
         defaultButton.focus();
       } catch (e) {
         // Swallow this. Could be the button is disabled
-        // and IE6 wishes to throw an error.
+        // and IE6 wishes to throw an error
       }
     }
   }
@@ -682,7 +682,7 @@ plana.ui.BootstrapDialog.prototype.focus = function() {
  * If the body element exists, then this returns the 'innerHTML'
  * property. Otherwise it returns the content as set by the users,
  * converted to a string
- * @return {string} Content HTML.
+ * @return {string} Content HTML
  */
 plana.ui.BootstrapDialog.prototype.getBodyContentAsString = function() {
   if (this.bodyEl_) {
@@ -704,8 +704,8 @@ plana.ui.BootstrapDialog.prototype.getBodyContentAsString = function() {
 /**
  * Returns the dialog's preferred ARIA role. This can be used to override the
  * default dialog role, e.g. with an ARIA role of ALERTDIALOG for a simple
- * warning or confirmation dialog.
- * @return {goog.a11y.aria.Role} This dialog's preferred ARIA role.
+ * warning or confirmation dialog
+ * @return {goog.a11y.aria.Role} This dialog's preferred ARIA role
  */
 plana.ui.BootstrapDialog.prototype.getPreferredAriaRole = function() {
   return this.preferredAriaRole_;
@@ -714,8 +714,8 @@ plana.ui.BootstrapDialog.prototype.getPreferredAriaRole = function() {
 /**
  * Sets the dialog's preferred ARIA role. This can be used to override the
  * default dialog role, e.g. with an ARIA role of ALERTDIALOG for a simple
- * warning or confirmation dialog.
- * @param {goog.a11y.aria.Role} role This dialog's preferred ARIA role.
+ * warning or confirmation dialog
+ * @param {goog.a11y.aria.Role} role This dialog's preferred ARIA role
  */
 plana.ui.BootstrapDialog.prototype.setPreferredAriaRole = function(role) {
   this.preferredAriaRole_ = role;
@@ -723,8 +723,8 @@ plana.ui.BootstrapDialog.prototype.setPreferredAriaRole = function(role) {
 
 /**
  * Returns the header element so that more complicated things can be done.
- * Renders if the DOM is not yet created.
- * @return {?Element} The header element.
+ * Renders if the DOM is not yet created
+ * @return {?Element} The header element
  */
 plana.ui.BootstrapDialog.prototype.getHeaderElement = function() {
   if (this.getElement() == null)
@@ -734,8 +734,8 @@ plana.ui.BootstrapDialog.prototype.getHeaderElement = function() {
 
 /**
  * Returns the title element so that more complicated things can be done with
- * the title.  Renders if the DOM is not yet created.
- * @return {?Element} The title element.
+ * the title.  Renders if the DOM is not yet created
+ * @return {?Element} The title element
  */
 plana.ui.BootstrapDialog.prototype.getTitleElement = function() {
   if (this.getElement() == null)
@@ -745,8 +745,8 @@ plana.ui.BootstrapDialog.prototype.getTitleElement = function() {
 
 /**
  * Returns the title close element so that more complicated things can be done
- * with the close area of the title.  Renders if the DOM is not yet created.
- * @return {?Element} The close box.
+ * with the close area of the title.  Renders if the DOM is not yet created
+ * @return {?Element} The close box
  */
 plana.ui.BootstrapDialog.prototype.getTitleCloseElement = function() {
   if (this.getElement() == null)
@@ -757,8 +757,8 @@ plana.ui.BootstrapDialog.prototype.getTitleCloseElement = function() {
 /**
  * Returns the body element so that more complicated things can be done with
  * the content area.  Renders if the DOM is not yet created.  Overrides
- * {@link goog.ui.Component#getContentElement}.
- * @return {Element} The content element.
+ * {@link goog.ui.Component#getContentElement}
+ * @return {Element} The content element
  * @override
  */
 plana.ui.BootstrapDialog.prototype.getContentElement = function() {
@@ -769,8 +769,8 @@ plana.ui.BootstrapDialog.prototype.getContentElement = function() {
 
 /**
  * Returns the footer element so that more complicated things can be done with
- * it.  Renders if the DOM is not yet created.
- * @return {?Element} The button container element.
+ * it.  Renders if the DOM is not yet created
+ * @return {?Element} The button container element
  */
 plana.ui.BootstrapDialog.prototype.getFooter = function() {
   if (this.getElement() == null)
@@ -780,8 +780,8 @@ plana.ui.BootstrapDialog.prototype.getFooter = function() {
 
 /**
  * Returns the button element so that more complicated things can be done with
- * the button area.  Renders if the DOM is not yet created.
- * @return {?Element} The button container element.
+ * the button area.  Renders if the DOM is not yet created
+ * @return {?Element} The button container element
  */
 plana.ui.BootstrapDialog.prototype.getButtonElement = function() {
   if (this.getElement() == null)
