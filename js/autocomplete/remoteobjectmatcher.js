@@ -156,6 +156,22 @@ plana.ui.ac.RemoteObjectMatcher.MAX_MATCHES_PARA = 'max_matches';
 plana.ui.ac.RemoteObjectMatcher.FULL_STRING_PARA = 'fullstring';
 
 /**
+ * The property name that will contain the server matches, if
+ * the server is returning additional information along the matches,
+ * for example, total available matches on the server
+ * @type {string}
+ */
+plana.ui.ac.RemoteObjectMatcher.MATCHES_PROPERTY = 'matches';
+
+/**
+ * The property name that will contain the total count of matches
+ * available on the server
+ * @type {string}
+ */
+plana.ui.ac.RemoteObjectMatcher.TOTAL_PROPERTY = 'total';
+
+
+/**
  * The property name of objects that contain the caption to display
  * in the list of suggestions
  * @type {string}
@@ -203,19 +219,35 @@ plana.ui.ac.RemoteObjectMatcher.prototype.onRequestCompleted = function(e) {
       var response = null;
       try {
         response = this.xhrIo.getResponseJson();
-        goog.asserts.assert('response must be an array',
-          goog.isArray(response));
       } catch (ex) {
         response = null;
       }
       if (response != null) {
+        /**
+         * @type {Array.<String|Object>}
+         */
+        var serverMatches;
+        /**
+         * @type {number}
+         */
+        var totalMatches;
+        if (goog.isArray(response)) {
+          serverMatches = response;
+          totalMatches = serverMatches.length;
+        } else {
+          serverMatches =
+            response[plana.ui.ac.RemoteObjectMatcher.MATCHES_PROPERTY];
+          totalMatches =
+            response[plana.ui.ac.RemoteObjectMatcher.TOTAL_PROPERTY];
+        }
         /** @type {Array.<plana.ui.ac.RemoteObject>} */
         var matches = [];
-        for (var i = 0, match; match = response[i]; ++i)
+        for (var i = 0, match; match = serverMatches[i]; ++i)
           matches.push(new plana.ui.ac.RemoteObject(match));
         this.dispatchEvent(
           new plana.ui.ac.RemoteObjectMatcher.Event(
-            plana.ui.ac.RemoteObjectMatcher.EventType.MATCHES, this, matches));
+            plana.ui.ac.RemoteObjectMatcher.EventType.MATCHES, this,
+            matches, totalMatches));
         matches = null;
       } else {
         this.dispatchEvent(
@@ -336,9 +368,19 @@ plana.ui.ac.RemoteObjectMatcher.EventType = {
  *     matcher instance that triggered the event
  * @param {Array.<plana.ui.ac.RemoteObject>=} opt_matches Optional
  *     array of matches
+ * @param {number=} opt_total Optional number of total matches
+ *     available on the server
  */
-plana.ui.ac.RemoteObjectMatcher.Event = function(type, target, opt_matches) {
+plana.ui.ac.RemoteObjectMatcher.Event = function(
+  type, target, opt_matches, opt_total) {
   goog.events.Event.call(this, type, target);
+
+  /**
+   * Optional total number of matches available on the server
+   * @type {number}
+   * @public
+   */
+  this.total = opt_total || 0;
 
   /**
    * Optional array of matches

@@ -16,52 +16,86 @@ Written by Kiran Lakhotia <kiran@plan-a-software.co.uk>, 2014
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <title>Google Closure Demos</title>
+  <style type="text/css">
+  .sidebar {
+    margin-top: 40px;
+  }
+  </style>
 </head>
 
 <body>
   <div class="container">
     <div class="row">
-      <div class="col-lg-12">
-        <div class="page-header">
-          <h1>Welcome to demo pages for additional Google closure components</h1>
+      <div class="col-md-3">
+        <div class="sidebar affix">
+          <ul class="nav">
+            <li><a href="#autocomplete">AutoComplete</a>
+            </li>
+            <li><a href="#typeahead">TypeaheadSearch</a>
+            </li>
+            <li><a href="#tagsinput">TagsInput</a>
+            </li>
+            <li><a href="#dialog">BootstrapDialog</a>
+            </li>
+          </ul>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="jumbotron">
-          <h1>AutoComplete</h1>
-          <p>This component is a wrapper around Google closure's
-            <code>goog.ui.ac.AutoComplete</code>component. It uses a caching remote object matcher that can retrieve autocomplete suggestions as plain strings or custom objects. It is best if the objects have a 'caption' property. This property is used to display the suggestions. If an object does not have a 'caption' property,
-            <code>toString()</code>is used instead.</p>
-          <p>
-            <a href="autocomplete.html" class="btn btn-primary btn-lg">See Demo</a>
-          </p>
+      <div class="col-md-9">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="page-header">
+              <h1>Welcome to demo pages for additional Google closure components</h1>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="jumbotron">
-          <h1>TypeaheadSearch</h1>
-          <p>This component is a wrapper around
-            <a href="autocomplete.html">
-              <code>plana.ui.ac.AutoComplete</code>
-            </a>. It provides an additional search button that can be used to trigger a fulltext search on the server.</p>
-          <p>
-            <a href="typeaheadsearch.html" class="btn btn-primary btn-lg">See Demo</a>
-          </p>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="jumbotron" id="autocomplete">
+              <h1>AutoComplete</h1>
+              <p>This component is a wrapper around Google closure's
+                <code>goog.ui.ac.AutoComplete</code>component. It uses a caching remote object matcher that can retrieve autocomplete suggestions as plain strings or custom objects. It is best if the objects have a 'caption' property. This property is used to display the suggestions. If an object does not have a 'caption' property,
+                <code>toString()</code>is used instead.</p>
+              <p>
+                <a href="autocomplete.html" class="btn btn-primary btn-lg">See Demo</a>
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="jumbotron">
-          <h1>TagsInput</h1>
-          <p>This component creates a tag input.</p>
-          <p>
-            <a href="tagsinput.html" class="btn btn-primary btn-lg">See Demo</a>
-          </p>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="jumbotron" id="typeahead">
+              <h1>TypeaheadSearch</h1>
+              <p>This component is a wrapper around
+                <a href="autocomplete.html">
+                  <code>plana.ui.ac.AutoComplete</code>
+                </a>. It provides an additional search button that can be used to trigger a fulltext search on the server.</p>
+              <p>
+                <a href="typeaheadsearch.html" class="btn btn-primary btn-lg">See Demo</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="jumbotron" id="tagsinput">
+              <h1>TagsInput</h1>
+              <p>This component creates a tag input.</p>
+              <p>
+                <a href="tagsinput.html" class="btn btn-primary btn-lg">See Demo</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="jumbotron" id="dialog">
+              <h1>BootstrapDialog</h1>
+              <p>This component creates a bootstrap style compatible modal dialog.</p>
+              <p>
+                <a href="bootstrapdialog.html" class="btn btn-primary btn-lg">See Demo</a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

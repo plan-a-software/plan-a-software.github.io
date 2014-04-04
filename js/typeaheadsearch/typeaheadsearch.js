@@ -24,6 +24,7 @@ goog.require('goog.events.EventType');
 goog.require('goog.net.XhrIo');
 goog.require('goog.net.XmlHttpFactory');
 goog.require('plana.ui.ac.AutoComplete');
+goog.require('plana.ui.ac.RemoteObject');
 goog.require('plana.ui.ac.RemoteObjectMatcher');
 goog.require('plana.ui.ac.RemoteObjectMatcher.EventType');
 goog.require('plana.ui.ts.TypeaheadSearchRenderer');
@@ -161,6 +162,7 @@ plana.ui.ts.TypeaheadSearch.prototype.onMatches_ = function(e) {
   this.searching_ = false;
   this.hidePlaceHolders();
 
+  /** @type {Array.<plana.ui.ac.RemoteObject>} */
   var matches = [];
   switch (e.type) {
     case plana.ui.ac.RemoteObjectMatcher.EventType.FAILED_REQUEST:
@@ -175,7 +177,8 @@ plana.ui.ts.TypeaheadSearch.prototype.onMatches_ = function(e) {
     this.dispatchEvent({
       type: plana.ui.ts.TypeaheadSearch.EventType.NO_MATCH,
       token: searchString,
-      matches: []
+      matches: [],
+      total: 0
     });
   } else {
     //send matches to listeners
@@ -184,7 +187,8 @@ plana.ui.ts.TypeaheadSearch.prototype.onMatches_ = function(e) {
       token: searchString,
       matches: goog.array.map(matches, function(m, indx, a) {
         return m.getData();
-      })
+      }),
+      total: e.total
     });
   }
 };
