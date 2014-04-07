@@ -108,7 +108,12 @@ plana.ui.ts.TypeaheadSearch.prototype.disposeInternal = function() {
  */
 plana.ui.ts.TypeaheadSearch.prototype.enterDocument = function() {
   plana.ui.ts.TypeaheadSearch.superClass_.enterDocument.call(this);
-  var renderer = this.componentRenderer;
+  /**
+   * @type {plana.ui.ts.TypeaheadSearchRenderer}
+   */
+  var renderer =
+  /**@type {plana.ui.ts.TypeaheadSearchRenderer}*/
+  (this.componentRenderer);
   var handler = this.getHandler();
   handler.listen(renderer.getSearchButton(this, this.dom_),
     goog.events.EventType.CLICK, this.onSearch_, false);
@@ -119,7 +124,12 @@ plana.ui.ts.TypeaheadSearch.prototype.enterDocument = function() {
  * @override
  */
 plana.ui.ts.TypeaheadSearch.prototype.exitDocument = function() {
-  var renderer = this.getRenderer();
+  /**
+   * @type {plana.ui.ts.TypeaheadSearchRenderer}
+   */
+  var renderer =
+  /**@type {plana.ui.ts.TypeaheadSearchRenderer}*/
+  (this.componentRenderer);
   var handler = this.getHandler();
   handler.unlisten(renderer.getSearchButton(this, this.dom_),
     goog.events.EventType.CLICK, this.onSearch_, false);
@@ -155,8 +165,8 @@ plana.ui.ts.TypeaheadSearch.prototype.onMatches_ = function(e) {
 
   this.cachingMatcher.disableLocalCache(false);
 
-  var input = this.inputHandler.getInput();
-  var searchString = input.value;
+  var input = /**@type {!HTMLInputElement}*/ (this.inputHandler.getInput());
+  var searchString = /**@type {!string}*/ (input.value);
   input.disabled = false;
   input.focus();
   this.searching_ = false;

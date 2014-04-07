@@ -299,11 +299,14 @@ plana.ui.tags.TagsInput.prototype.renderTag_ = function(tag, index) {
   handler.listen(removeBtn, goog.events.EventType.CLICK,
     this.onRemoveTag_, false);
 
+  /**
+   * @type {string}
+   */
   var css;
   if (goog.isString(tag) || !goog.isDefAndNotNull(tag['tagClass'])) {
     css = plana.ui.tags.TagsInput.DEFAULT_TAG_CSS;
   } else {
-    css = tag['tagClass'];
+    css = /**@type {string}*/ (tag['tagClass']);
   }
 
   var tagSpn = dom.createDom('span', {
@@ -358,7 +361,14 @@ plana.ui.tags.TagsInput.prototype.onRemoveTag_ = function(e) {
  * @private
  */
 plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
-  if (e.data == null) {
+  /**
+      @type {{
+        type: string,
+        data: (Object|string|null)
+      }}
+   */
+  var eventData = /**@type {{type: string, data: (Object|string|null)}}*/ (e);
+  if (eventData.data == null) {
     var tokens = this.autocomplete_.getNonMatches();
 
     if (tokens.length == 0) {
@@ -377,20 +387,22 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
         tag: tokens[0]
       });
       return;
-    } else {
-      e.data = tokens[0];
     }
+
+    eventData.data = tokens[0];
   }
 
   //add tag to model
   var tags = /** @type {?Array.<string|Object>} */ (this.getModel());
   if (tags == null) {
     //this will render the tags
-    this.setModel([e.data]);
-    this.onChange_(plana.ui.tags.TagsInput.EventType.ADDED, e.data);
+    this.setModel([ /**@type {string|Object}*/ (eventData.data)]);
+    this.onChange_(plana.ui.tags.TagsInput.EventType.ADDED,
+      /**@type {string|Object}*/
+      (eventData.data));
   } else {
     var dom = this.dom_;
-    var tagObj = new plana.ui.ac.RemoteObject(e.data);
+    var tagObj = new plana.ui.ac.RemoteObject(eventData.data);
     var tagStr = tagObj.toString();
     tagObj.dispose();
 
@@ -414,9 +426,11 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
     if (duplicateIndex == -1) {
       //render tag manually
       var numTags = this.tags_.length;
-      this.renderTag_(e.data, numTags);
-      tags.push(e.data);
-      this.onChange_(plana.ui.tags.TagsInput.EventType.ADDED, e.data);
+      this.renderTag_(eventData.data, numTags);
+      tags.push(eventData.data);
+      this.onChange_(plana.ui.tags.TagsInput.EventType.ADDED,
+        /**@type {string|Object}*/
+        (eventData.data));
     } else {
       //fade out then back in
       var tag = this.tags_[duplicateIndex];
@@ -434,13 +448,13 @@ plana.ui.tags.TagsInput.prototype.onCheckAddTag_ = function(e) {
 
       var handler = this.getHandler();
       handler.listenOnce(this.duplicateFadeOutFx_,
-        goog.fx.Animation.EventType.END, function(e) {
+        goog.fx.Animation.EventType.END, function(fxe) {
           this.duplicateFadeInFx_.play();
           this.duplicateFadeOutFx_.dispose();
           this.duplicateFadeOutFx_ = null;
         }, false);
       handler.listenOnce(this.duplicateFadeInFx_,
-        goog.fx.Animation.EventType.END, function(e) {
+        goog.fx.Animation.EventType.END, function(fxe) {
           this.duplicateFadeInFx_.dispose();
           this.duplicateFadeInFx_ = null;
         }, false);

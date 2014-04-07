@@ -562,9 +562,21 @@ plana.ui.ac.AutoComplete.prototype.onKey = function(e) {
 plana.ui.ac.AutoComplete.prototype.onUpdate_ = function(e) {
   switch (e.type) {
     case goog.ui.ac.AutoComplete.EventType.UPDATE:
-      var rowData = e.row;
-      if (rowData != null)
-        rowData = rowData.getData();
+      var eventData =
+      /**@type {{
+            type: string,
+            row: ?plana.ui.ac.RemoteObject,
+            index: number
+          }}*/
+      (e);
+
+      /**
+       * @type {Object|string|null}
+       */
+      var rowData = null;
+      if (eventData.row != null)
+        rowData =
+          ( /**@type {!plana.ui.ac.RemoteObject}*/ (eventData.row)).getData();
       /**
        * Forward the event to any listeners that might be
        * interested when an update occurred
@@ -578,7 +590,7 @@ plana.ui.ac.AutoComplete.prototype.onUpdate_ = function(e) {
     case goog.ui.ac.AutoComplete.EventType.SUGGESTIONS_UPDATE:
       this.setSuggestionListWidth_();
       var state = this.cachingMatcher.getState();
-      var renderer = this.autoComplete.getRenderer();
+      var renderer = this.autoCompleteRenderer_;
       var dom = this.dom_;
       switch (state) {
         case plana.ui.ac.CachingObjectMatcher.State.FETCHING:
@@ -619,10 +631,10 @@ plana.ui.ac.AutoComplete.prototype.onUpdate_ = function(e) {
       break;
     case goog.ui.ac.AutoComplete.EventType.DISMISS:
       this.hidePlaceHolders();
-      this.autoComplete.getRenderer().dismiss();
+      this.autoCompleteRenderer_.dismiss();
       break;
     default:
-      ;
+      throw 'invalid caching matcher state';
   }
 };
 
@@ -706,37 +718,52 @@ plana.ui.ac.AutoComplete.prototype.getModel = function() {
  */
 plana.ui.ac.AutoComplete.prototype.getNonMatches = function() {
   if (this.inputHandler == null) return [];
-
-  var inputHandler = this.inputHandler;
+  /**
+   * @type {?plana.ui.ac.InputHandler}
+   */
+  var inputHandler =
+  /**@type {?plana.ui.ac.InputHandler}*/
+  (this.inputHandler);
   var entries = inputHandler.getEntries();
   var matches = inputHandler.getMatchedObjects();
-  var filtered = goog.array.filter(entries, function(text, indx) {
-    if (goog.string.isEmptySafe(text)) return false;
-    text = goog.string.trim(text);
-    for (var i = 0, match; match = matches[i]; ++i) {
-      var remove = false;
-      if (goog.isString(match)) {
-        if (inputHandler.areStringsEqual(goog.string.trim(match), text))
-          remove = true;
-      } else {
-        var caption = match[plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY];
-        if (goog.isDefAndNotNull(caption)) {
-          caption = goog.string.trim(caption);
-          if (inputHandler.areStringsEqual(caption, text)) {
+  var filtered = goog.array.filter(entries,
+    /**
+     * @param  {!string} text
+     * @param  {number} indx
+     * @return {boolean}
+     */
+
+    function(text, indx) {
+      if (goog.string.isEmptySafe(text)) return false;
+      text = goog.string.trim(text);
+      for (var i = 0, match; match = matches[i]; ++i) {
+        var remove = false;
+        if (goog.isString(match)) {
+          if (inputHandler.areStringsEqual(goog.string.trim(match), text))
             remove = true;
-          }
         } else {
-          remove = inputHandler.areStringsEqual(
-            goog.string.trim(match.toString()),
-            text);
+          /**
+           * @type {string|undefined}
+           */
+          var caption =
+            match[plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY];
+          if (goog.isDefAndNotNull(caption)) {
+            caption = goog.string.trim(caption);
+            if (inputHandler.areStringsEqual(caption, text)) {
+              remove = true;
+            }
+          } else {
+            remove = inputHandler.areStringsEqual(
+              goog.string.trim(match.toString()),
+              text);
+          }
+        }
+        if (remove == true) {
+          return false;
         }
       }
-      if (remove) {
-        return false;
-      }
-    }
-    return true;
-  });
+      return true;
+    });
   inputHandler = null;
   return goog.array.map(filtered, function(text, indx) {
     return goog.string.trim(text);

@@ -326,6 +326,11 @@ plana.ui.ac.CachingObjectMatcher.prototype.getPrefixMatchesForRows = function(
  */
 plana.ui.ac.CachingObjectMatcher.prototype.getSimilarMatchesForRows = function(
   token, maxMatches) {
+  /**
+   * @type {Array.<{obj: plana.ui.ac.RemoteObject,
+   *           score: number,
+   *           index: number}>}
+   */
   var results = [];
 
   for (var index = 0, row; row = this.rows_[index]; ++index) {
@@ -371,13 +376,24 @@ plana.ui.ac.CachingObjectMatcher.prototype.getSimilarMatchesForRows = function(
     }
   }
 
-  results.sort(function(a, b) {
-    var diff = a.score - b.score;
-    if (diff != 0) {
-      return diff;
-    }
-    return a.index - b.index;
-  });
+  results.sort(
+    /**
+     * @param  {{obj: plana.ui.ac.RemoteObject,
+     *           score: number,
+     *           index: number}} a Score a
+     * @param  {{obj: plana.ui.ac.RemoteObject,
+     *           score: number,
+     *           index: number}} b Score b
+     * @return {number}
+     */
+
+    function(a, b) {
+      var diff = a.score - b.score;
+      if (diff != 0) {
+        return diff;
+      }
+      return a.index - b.index;
+    });
 
   var matches = [];
   for (var i = 0; i < maxMatches && i < results.length; ++i) {

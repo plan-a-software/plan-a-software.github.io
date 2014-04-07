@@ -34,15 +34,21 @@ goog.inherits(plana.ui.ac.BootstrapRenderer, plana.ui.ac.AutoCompleteRenderer);
  * This function creates the DOM structure for the autocomplete
  * component and returns it
  * @param {!goog.dom.DomHelper} dom
- * @return {Element}
+ * @return {!Element}
  * @override
  */
 plana.ui.ac.BootstrapRenderer.prototype.createDom = function(dom) {
-  var div = dom.createDom('div');
-  var input = dom.createDom('input', {
+  /**
+   * @type {!Element}
+   */
+  var div = /**@type {!Element}*/ (dom.createDom('div'));
+  /**
+   * @type {!HTMLInputElement}
+   */
+  var input = /**@type {!HTMLInputElement}*/ (dom.createDom('input', {
     'type': 'text',
     'class': 'form-control'
-  });
+  }));
   dom.appendChild(div, input);
   return div;
 };

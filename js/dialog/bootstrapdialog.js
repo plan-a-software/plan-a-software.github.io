@@ -49,7 +49,7 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
 
   /**
    * The dialog close button
-   * @type {?Element}
+   * @type {?HTMLButtonElement}
    * @private
    */
   this.closeBtn_ = null;
@@ -137,7 +137,7 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * The array of action buttons. They will be
    * rendered in the order they are added
-   * @type {?Array.<Element>}
+   * @type {?Array.<HTMLButtonElement>}
    * @private
    */
   this.actionButtons_ = [];
@@ -214,11 +214,11 @@ plana.ui.BootstrapDialog.prototype.createDom = function() {
     'class': 'modal-header'
   });
   dom.appendChild(this.contentEl_, this.headerEl_);
-  this.closeBtn_ = dom.createDom('button', {
+  this.closeBtn_ = /**@type {HTMLButtonElement}*/ (dom.createDom('button', {
     'type': 'button',
     'class': 'close',
     'aria-hidden': true
-  }, dom.htmlToDocumentFragment('&times;'));
+  }, dom.htmlToDocumentFragment('&times;')));
   dom.appendChild(this.headerEl_, this.closeBtn_);
   this.titleEl_ = dom.createDom('h4', {
     'class': 'modal-title'
@@ -277,13 +277,16 @@ plana.ui.BootstrapDialog.prototype.decorateInternal = function(element) {
   var modalChildren = dom.getChildren(element);
   goog.asserts.assert(modalChildren.length == 1,
     'modal dialog must have only one child: modal-dialog');
+  /**
+   * @type {!Element}
+   */
   var dlg = modalChildren[0];
   goog.asserts.assert(goog.dom.classes.has(dlg, 'modal-dialog'),
     'the dialog element must have modal-dialog class');
   var contentChildren = dom.getChildren(dlg);
   goog.asserts.assert(contentChildren.length == 1,
     'modal-dialog class element can only have one child: modal-content');
-  this.contentEl_ = contentChildren[0];
+  this.contentEl_ = /**@type {!Element}*/ (contentChildren[0]);
   goog.asserts.assert(goog.dom.classes.has(this.contentEl_, 'modal-content'),
     'the content element must have modal-content class');
 
@@ -300,10 +303,11 @@ plana.ui.BootstrapDialog.prototype.decorateInternal = function(element) {
   var title = dom.getElementsByTagNameAndClass(null,
     'modal-title', this.contentEl_);
   if (title.length > 0) {
-    var titleEl = title[0];
+    var titleEl = /**@type {!Element}*/ (title[0]);
     goog.a11y.aria.setState( /**@type {!Element}*/ (element),
       goog.a11y.aria.State.LABELLEDBY,
-      titleEl['id'] || '');
+      /**@type {string|undefined}*/
+      (titleEl['id']) || '');
   }
 
   var body = dom.getElementsByTagNameAndClass(null,
@@ -314,10 +318,11 @@ plana.ui.BootstrapDialog.prototype.decorateInternal = function(element) {
   var footer = dom.getElementsByTagNameAndClass(null,
     'modal-footer');
   if (footer.length > 0) {
-    this.footerEl_ = footer[0];
+    this.footerEl_ = /**@type {!Element}*/ (footer[0]);
     var btns = dom.getElementsByTagNameAndClass('button',
       null, this.footerEl_);
-    for (var i = 0, btn; btn = btns[i]; ++i) {
+    for (var i = 0, btn; btn = /**@type {!HTMLButtonElement}*/ (btns[i]);
+      ++i) {
       this.actionButtons_.push(btn);
     }
   }
@@ -390,7 +395,7 @@ plana.ui.BootstrapDialog.prototype.onResize = function(e) {
  * @private
  */
 plana.ui.BootstrapDialog.prototype.onButtonClick_ = function(e) {
-  var btn = /**@type {!Node}*/ (e.target);
+  var btn = /**@type {!HTMLButtonElement}*/ (e.target);
   var caption = this.dom_.getTextContent(btn);
   var key = this.getButtonKey_(btn);
 
@@ -413,15 +418,18 @@ plana.ui.BootstrapDialog.prototype.onButtonClick_ = function(e) {
  * @private
  */
 plana.ui.BootstrapDialog.prototype.getButtonKey_ = function(btn) {
+  /**
+   * @type {string|undefined}
+   */
   var key = btn['name'];
   if (!key || key == '')
-    key = btn['id'];
+    key = /**@type {string|undefined}*/ (btn['id']);
   return key ? key : '';
 };
 
 /**
  * This function returns the cancel button if it exists
- * @return {?Element} The cancel button or null if non exists
+ * @return {?HTMLButtonElement} The cancel button or null if non exists
  * @private
  */
 plana.ui.BootstrapDialog.prototype.getCancelButton_ = function() {
@@ -437,7 +445,7 @@ plana.ui.BootstrapDialog.prototype.getCancelButton_ = function() {
 /**
  * This function returns the default button if it exists. It looks
  * for 'data-role==default'
- * @return {?Element} The default button or null if non exists
+ * @return {?HTMLButtonElement} The default button or null if non exists
  * @private
  */
 plana.ui.BootstrapDialog.prototype.getDefaultButton_ = function() {
@@ -460,7 +468,10 @@ plana.ui.BootstrapDialog.prototype.onKey_ = function(e) {
   var close = false;
   var hasHandler = false;
   var hasButtons = this.actionButtons_.length > 0;
-  var target = e.target;
+  /**
+   * @type {!HTMLElement}
+   */
+  var target = /**@type {!HTMLElement}*/ (e.target);
 
   if (e.type == goog.events.EventType.KEYDOWN) {
     // Escape and tab can only properly be handled in keydown handlers
@@ -470,7 +481,8 @@ plana.ui.BootstrapDialog.prototype.onKey_ = function(e) {
 
       // Users may expect to hit escape on a SELECT element
       var isSpecialFormElement =
-        target.tagName == 'SELECT' && !target.disabled;
+        target.tagName == 'SELECT' &&
+        ( /**@type {HTMLSelectElement}*/ (target)).disabled == false;
 
       if (cancel && !isSpecialFormElement) {
         hasHandler = true;
@@ -493,24 +505,46 @@ plana.ui.BootstrapDialog.prototype.onKey_ = function(e) {
   } else if (e.keyCode == goog.events.KeyCodes.ENTER) {
     // Only handle ENTER in keypress events, in case the action opens a
     // popup window
-    var key, caption, btnTarget;
-    if (target.tagName == 'BUTTON' && !target.disabled) {
+    /**
+     * @type {string | undefined}
+     */
+    var key = undefined;
+    /**
+     * @type {string | undefined}
+     */
+    var caption = undefined;
+    /**
+     * @type {HTMLButtonElement|undefined}
+     */
+    var btnTarget;
+    if (target.tagName == 'BUTTON' &&
+      ( /**@type {HTMLButtonElement}*/ (target)).disabled == false) {
+
       // If the target is a button and it's enabled, we can fire that button's
       // handler
-      key = target.name;
+      key =
+      /**@type {string}*/
+      ( /**@type {HTMLButtonElement}*/ (target).name);
       caption = this.dom_.getTextContent(target);
-      btnTarget = target;
+      btnTarget = /**@type {HTMLButtonElement}*/ (target);
     } else if (hasButtons) {
       // Try to fire the default button's handler (if one exists), but only if
       // the button is enabled
+      /**
+       * @type {?HTMLButtonElement}
+       */
       var defaultButton = this.getDefaultButton_();
 
       // Users may expect to hit enter on a TEXTAREA, SELECT or an A element
       var isSpecialFormElement =
         (target.tagName == 'TEXTAREA' || target.tagName == 'SELECT' ||
-        target.tagName == 'A') && !target.disabled;
+        target.tagName == 'A') &&
+        ( /**@type {HTMLSelectElement|HTMLTextAreaElement|HTMLAnchorElement}*/
+        (target)).disabled == false;
 
-      if (defaultButton && !defaultButton.disabled && !isSpecialFormElement) {
+      if (defaultButton &&
+        ( /**@type {HTMLButtonElement}*/ (defaultButton)).disabled == false &&
+        isSpecialFormElement == false) {
         key = this.getButtonKey_(defaultButton);
         caption = this.dom_.getTextContent(defaultButton);
         btnTarget = defaultButton;
@@ -634,6 +668,9 @@ plana.ui.BootstrapDialog.prototype.setVisible = function(visible) {
     this.focus();
   } else {
     if (this.disposeOnHide_) {
+      /**
+       * @type {?plana.ui.BootstrapDialog}
+       */
       var self = this;
       window.setTimeout(function() {
         self.dispose();
@@ -750,7 +787,7 @@ plana.ui.BootstrapDialog.prototype.getTitleElement = function() {
 /**
  * Returns the title close element so that more complicated things can be done
  * with the close area of the title.  Renders if the DOM is not yet created
- * @return {?Element} The close box
+ * @return {?HTMLButtonElement} The close box
  */
 plana.ui.BootstrapDialog.prototype.getTitleCloseElement = function() {
   if (this.getElement() == null)
@@ -805,7 +842,8 @@ plana.ui.BootstrapDialog.prototype.setDisposeOnHide = function(b) {
  * This function adds a button to the dialog. Buttons must be added before
  * the dialog is rendered. A user can either add an existing button element,
  * or a {key: string, caption: string} object that will be rendered as button
- * @param {Element|Object} button The button to add
+ * @param {HTMLButtonElement|{key: string, caption: string}} button The button
+ *     to add
  * @param {boolean=} opt_isDefault Whether the button is the default button.
  *     Results in css class 'btn-primary' if the button parameter is not an
  *     existing HTML element
@@ -819,7 +857,7 @@ plana.ui.BootstrapDialog.prototype.addButton = function(
   var isDefault = opt_isDefault || false;
   var isCancel = opt_isCancel || false;
   /**
-   * @type {!Element}
+   * @type {HTMLButtonElement}
    */
   var buttonEl;
   var dom = this.dom_;
@@ -830,13 +868,13 @@ plana.ui.BootstrapDialog.prototype.addButton = function(
     } else {
       css = opt_css ? opt_css : 'btn-default';
     }
-    buttonEl = dom.createDom('button', {
+    buttonEl = /**@type {HTMLButtonElement}*/ (dom.createDom('button', {
       'type': 'button',
       'class': 'btn ' + css,
       'name': button.key
-    }, dom.createTextNode(button.caption));
+    }, dom.createTextNode(button.caption)));
   } else {
-    buttonEl = /**@type {!Element}*/ (button);
+    buttonEl = /**@type {HTMLButtonElement}*/ (button);
   }
   if (isCancel)
     goog.dom.dataset.set(buttonEl, 'dismiss', this.getCssClass());
@@ -851,7 +889,7 @@ plana.ui.BootstrapDialog.prototype.addButton = function(
  * This function returns the HTML of a button or null
  * if the button is not found
  * @param  {!string} key The key of the button to get
- * @return {?Element}     The button or null
+ * @return {?HTMLButtonElement}     The button or null
  */
 plana.ui.BootstrapDialog.prototype.getButton = function(key) {
   for (var i = 0, btn; btn = this.actionButtons_[i]; ++i) {

@@ -49,8 +49,8 @@ goog.require('plana.ui.ac.RemoteObject');
  *
  * @constructor
  * @extends {goog.events.EventTarget}
- * @param {!Element} element The input element to use with the autocomplete
- *     control
+ * @param {!HTMLInputElement} element The input element to use with the
+ *     autocomplete control
  * @param {?boolean=} opt_multi Whether to allow multiple entries
  *     (Default: false)
  */
@@ -59,7 +59,7 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
 
   /**
    * Reference to the input element we'er listening to
-   * @type {Element}
+   * @type {?HTMLInputElement}
    * @private
    */
   this.input_ = element;
@@ -288,7 +288,8 @@ plana.ui.ac.InputHandler.prototype.disposeInternal = function() {
  * @private
  */
 plana.ui.ac.InputHandler.prototype.startUpdateCheckTimer_ = function() {
-  this.updateTimer_ = new goog.Timer( /** @type {number} */ (this.updateInterval_));
+  this.updateTimer_ =
+    new goog.Timer( /** @type {number} */ (this.updateInterval_));
   this.eventHandler_.listen(this.updateTimer_,
     goog.Timer.TICK, this.onTick_, false);
   this.updateTimer_.start();
@@ -450,6 +451,9 @@ plana.ui.ac.InputHandler.prototype.handleSeparator_ = function(e) {
  * @private
  */
 plana.ui.ac.InputHandler.prototype.onBlur_ = function(e) {
+  /**
+   * @type {plana.ui.ac.InputHandler}
+   */
   var self = this;
   /*send blur event slightly delayed in case it fires before
    *the click event in the renderer has been fired and handled
@@ -599,7 +603,7 @@ plana.ui.ac.InputHandler.prototype.getEntries = function() {
 
 /**
  * Getter for the HTML input element
- * @return {Element}
+ * @return {HTMLInputElement}
  */
 plana.ui.ac.InputHandler.prototype.getInput = function() {
   return this.input_;
@@ -650,6 +654,9 @@ plana.ui.ac.InputHandler.prototype.selectRow = function(row) {
     entries[index] = row.toString();
 
     //compute caret position
+    /**
+     * @type {number}
+     */
     var pos = 0;
     for (var i = 0; i <= index; ++i) {
       //+1 for separator
@@ -663,15 +670,24 @@ plana.ui.ac.InputHandler.prototype.selectRow = function(row) {
       pos += 1;
     }
 
+    /**
+     * @type {?string}
+     */
     var sep = this.defaultSeparator_ + ' ';
 
     /**
-     * @type {?function(string): string}
+     * @type {?function(string):string}
      */
-    var adjustSeparators = function(regexMatch) {
-      pos += 1;
-      return sep + regexMatch.substring(1);
-    };
+    var adjustSeparators =
+    /**
+     * @param {string} regexMatch
+     * @return {string}
+     */
+
+      function(regexMatch) {
+        pos += 1;
+        return sep + regexMatch.substring(1);
+      };
     this.input_.value = str.replace( /** @type {RegExp} */ (this.formatRegEx_),
       adjustSeparators);
     sep = null;

@@ -232,13 +232,15 @@ plana.ui.ac.RemoteObjectMatcher.prototype.onRequestCompleted = function(e) {
          */
         var totalMatches;
         if (goog.isArray(response)) {
-          serverMatches = response;
+          serverMatches = /**@type {Array.<String|Object>}*/ (response);
           totalMatches = serverMatches.length;
         } else {
           serverMatches =
-            response[plana.ui.ac.RemoteObjectMatcher.MATCHES_PROPERTY];
+          /**@type {Array.<String|Object>}*/
+          (response[plana.ui.ac.RemoteObjectMatcher.MATCHES_PROPERTY]);
           totalMatches =
-            response[plana.ui.ac.RemoteObjectMatcher.TOTAL_PROPERTY];
+          /**@type {number}*/
+          (response[plana.ui.ac.RemoteObjectMatcher.TOTAL_PROPERTY]);
         }
         /** @type {Array.<plana.ui.ac.RemoteObject>} */
         var matches = [];

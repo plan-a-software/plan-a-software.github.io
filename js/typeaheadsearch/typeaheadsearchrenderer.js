@@ -60,13 +60,14 @@ plana.ui.ts.TypeaheadSearchRenderer.prototype.createDom = function(dom) {
  * This function returns the text input
  * @param {!goog.ui.Component} component
  * @param {!goog.dom.DomHelper} dom
- * @return {?Element}
+ * @return {?HTMLInputElement}
  */
 plana.ui.ts.TypeaheadSearchRenderer.prototype.getInput = function(
   component, dom) {
   var wrapper = component.getElement();
   if (wrapper)
-    return dom.getFirstElementChild(dom.getFirstElementChild(wrapper));
+    return /**@type {HTMLInputElement}*/ (dom.getFirstElementChild(
+      dom.getFirstElementChild(wrapper)));
   return null;
 };
 

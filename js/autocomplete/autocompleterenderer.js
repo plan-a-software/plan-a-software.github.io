@@ -17,6 +17,8 @@
 'use strict';
 
 goog.provide('plana.ui.ac.AutoCompleteRenderer');
+goog.require('goog.dom.DomHelper');
+goog.require('goog.ui.Component');
 
 /**
  * This is the default renderer for the
@@ -33,11 +35,17 @@ plana.ui.ac.AutoCompleteRenderer = function() {};
  * @return {!Element}
  */
 plana.ui.ac.AutoCompleteRenderer.prototype.createDom = function(dom) {
-  var div = dom.createDom('div');
-  var input = dom.createDom('input', {
+  /**
+   * @type {!Element}
+   */
+  var div = /**@type {!Element}*/ (dom.createDom('div'));
+  /**
+   * @type {!HTMLInputElement}
+   */
+  var input = /**@type {!HTMLInputElement}*/ (dom.createDom('input', {
     'type': 'text',
     'class': 'ac-input'
-  });
+  }));
   dom.appendChild(div, input);
   return div;
 };
@@ -47,11 +55,14 @@ plana.ui.ac.AutoCompleteRenderer.prototype.createDom = function(dom) {
  * otherwise
  * @param {!goog.ui.Component} component
  * @param {!goog.dom.DomHelper} dom
- * @return {?Element}
+ * @return {?HTMLInputElement}
  */
 plana.ui.ac.AutoCompleteRenderer.prototype.getInput = function(component, dom) {
+  /**
+   * @type {?Element}
+   */
   var div = component.getElement();
   if (div)
-    return dom.getFirstElementChild(div);
+    return /**@type {HTMLInputElement}*/ (dom.getFirstElementChild(div));
   return null;
 };
