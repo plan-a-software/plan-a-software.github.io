@@ -76,7 +76,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
 
   /**
    * The class for performing ajax requests
-   * @type {?goog.net.XhrIo}
+   * @type {goog.net.XhrIo}
    * @protected
    */
   this.xhrIo = opt_xhrIo || new goog.net.XhrIo(opt_xmlHttpFactory);
@@ -84,7 +84,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
   /**
    * Boolean flag whether the request object
    * is ready to handle another request
-   * @type {?boolean}
+   * @type {boolean}
    * @protected
    */
   this.xhrIoReady = true;
@@ -99,7 +99,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
 
   /**
    * The type of request, i.e. 'GET' or 'POST'
-   * @type {?string}
+   * @type {string}
    * @private
    */
   this.xhrIoRequestType_ = 'GET';
@@ -107,7 +107,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
   /**
    * The event handler used by this class to listen to
    * ajax events
-   * @type {?goog.events.EventHandler}
+   * @type {goog.events.EventHandler}
    * @private
    */
   this.eventHandler_ = new goog.events.EventHandler(this);
@@ -180,6 +180,7 @@ plana.ui.ac.RemoteObjectMatcher.CAPTION_PROPERTY = 'caption';
 
 /**
  * @override
+ * @suppress {checkTypes}
  */
 plana.ui.ac.RemoteObjectMatcher.prototype.disposeInternal = function() {
   plana.ui.ac.RemoteObjectMatcher.superClass_.disposeInternal.call(this);
@@ -403,7 +404,7 @@ goog.inherits(plana.ui.ac.RemoteObjectMatcher.Event, goog.events.Event);
  * Otherwise the 'toString' method is used
  * @constructor
  * @extends {goog.Disposable}
- * @param {Object|string} data The match object returned by the server
+ * @param {Object|string|null} data The match object returned by the server
  */
 plana.ui.ac.RemoteObject = function(data) {
   goog.Disposable.call(this);

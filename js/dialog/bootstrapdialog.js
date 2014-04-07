@@ -121,7 +121,7 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
 
   /**
    * The dialog's preferred ARIA role
-   * @type {?goog.a11y.aria.Role}
+   * @type {goog.a11y.aria.Role}
    * @private
    */
   this.preferredAriaRole_ = goog.a11y.aria.Role.DIALOG;
@@ -129,7 +129,7 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * Flag whether the escape key dismisses
    * the dialog
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.escapeToCancel_ = true;
@@ -137,14 +137,14 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * The array of action buttons. They will be
    * rendered in the order they are added
-   * @type {?Array.<HTMLButtonElement>}
+   * @type {Array.<HTMLButtonElement>}
    * @private
    */
   this.actionButtons_ = [];
 
   /**
    * Viewportsize monitor
-   * @type {?goog.dom.ViewportSizeMonitor}
+   * @type {goog.dom.ViewportSizeMonitor}
    * @private
    */
   this.vm_ = new goog.dom.ViewportSizeMonitor();
@@ -153,6 +153,7 @@ goog.inherits(plana.ui.BootstrapDialog, goog.ui.ModalPopup);
 
 /**
  * @override
+ * @suppress {checkTypes}
  */
 plana.ui.BootstrapDialog.prototype.disposeInternal = function() {
   plana.ui.BootstrapDialog.superClass_.disposeInternal.call(this);
@@ -748,8 +749,7 @@ plana.ui.BootstrapDialog.prototype.getBodyContentAsString = function() {
  * @return {goog.a11y.aria.Role} This dialog's preferred ARIA role
  */
 plana.ui.BootstrapDialog.prototype.getPreferredAriaRole = function() {
-  var role = /**@type {goog.a11y.aria.Role}*/ (this.preferredAriaRole_);
-  return role;
+  return this.preferredAriaRole_;
 };
 
 /**

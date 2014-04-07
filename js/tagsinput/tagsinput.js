@@ -62,7 +62,7 @@ plana.ui.tags.TagsInput = function(
 
   /**
    * The autocomplete to create new tags
-   * @type {?plana.ui.ac.AutoComplete}
+   * @type {plana.ui.ac.AutoComplete}
    * @private
    */
   this.autocomplete_ = new plana.ui.ac.AutoComplete(uri, false,
@@ -79,7 +79,7 @@ plana.ui.tags.TagsInput = function(
 
   /**
    * Array of displayed tag elements
-   * @type {?Array.<Element>}
+   * @type {Array.<Element>}
    * @private
    */
   this.tags_ = [];
@@ -87,14 +87,14 @@ plana.ui.tags.TagsInput = function(
   /**
    * Flag whether we should be case insensitive when checking
    * if a tag exists already
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.caseInsensitive_ = true;
 
   /**
    * The default width to use for the autocomplete input
-   * @type {?number}
+   * @type {number}
    * @private
    */
   this.inputSize_ = 8;
@@ -116,7 +116,7 @@ plana.ui.tags.TagsInput = function(
   /**
    * Flag whether the user is allowed to create tags if
    * the autocomplete didn't find a match
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.allowCreateTags_ = opt_createNew || false;
@@ -144,12 +144,14 @@ plana.ui.tags.TagsInput.FADE_SPEED = 100;
 
 /**
  * @override
+ * @suppress {checkTypes}
  */
 plana.ui.tags.TagsInput.prototype.disposeInternal = function() {
   plana.ui.tags.TagsInput.superClass_.disposeInternal.call(this);
   this.autocomplete_.dispose();
   this.autocomplete_ = null;
   this.tagsContainer_ = null;
+  this.tags_.length = 0;
   this.tags_ = null;
   this.caseInsensitive_ = null;
   this.inputSize_ = null;
@@ -303,7 +305,8 @@ plana.ui.tags.TagsInput.prototype.renderTag_ = function(tag, index) {
    * @type {string}
    */
   var css;
-  if (goog.isString(tag) || !goog.isDefAndNotNull(tag['tagClass'])) {
+  if (goog.isString(tag) || !goog.isDefAndNotNull(tag['tagClass']) ||
+    goog.isString(tag['tagClass']) == false) {
     css = plana.ui.tags.TagsInput.DEFAULT_TAG_CSS;
   } else {
     css = /**@type {string}*/ (tag['tagClass']);

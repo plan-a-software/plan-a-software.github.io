@@ -59,7 +59,7 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
 
   /**
    * Reference to the input element we'er listening to
-   * @type {?HTMLInputElement}
+   * @type {!HTMLInputElement}
    * @private
    */
   this.input_ = element;
@@ -95,14 +95,14 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
 
   /**
    * The interval to use for the update timer
-   * @type {?number}
+   * @type {number}
    * @private
    */
   this.updateInterval_ = 150;
 
   /**
    * Flag whether a user can enter multiple items
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.supportsMulti_ = opt_multi || false;
@@ -112,14 +112,14 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
    * The separators used if the input supports multiple entries.
    * Added here because the base class doesn't expose this
    * property
-   * @type {?string}
+   * @type {string}
    * @private
    */
   this.separators_ = plana.ui.ac.InputHandler.STANDARD_LIST_SEPARATORS;
 
   /**
    * The regular expression to split the value of the text input
-   * @type {?RegExp}
+   * @type {RegExp}
    * @private
    */
   this.sepSplitRegEx_ = new RegExp('[' + this.separators_ + ']');
@@ -128,7 +128,7 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
    * The default character to use for separating tokens in multi mode.
    * This is used in 'autocomplete' mode, i.e. when automatically appending
    * the separator when the user selected a match
-   * @type {?string}
+   * @type {string}
    * @private
    */
   this.defaultSeparator_ = this.separators_.substring(0, 1);
@@ -136,7 +136,7 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
   /**
    * The regular expression to make sure we have a separator + space
    * for multi token inputs
-   * @type {?RegExp}
+   * @type {RegExp}
    * @private
    */
   this.formatRegEx_ = new RegExp(this.defaultSeparator_ + '([^\\s])', 'g');
@@ -150,7 +150,7 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
    * useful when the suggestions depend on complete keywords. Note that
    * "obama, hill" (a leading sub-string of "obama, hillary" will lead to
    * different and possibly irrelevant suggestions.
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.separatorUpdates_ = true;
@@ -161,14 +161,14 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
    * to autocomplete?
    * For example, if 'tomato' is a suggested completion and the user has typed
    * 'to,', do we autocomplete to turn that into 'tomato,'?
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.separatorSelects_ = true;
 
   /**
    * The previous value of the text input before a key event
-   * @type {?string}
+   * @type {string}
    * @private
    */
   this.previousValue_ = '';
@@ -177,14 +177,14 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
    * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
    * Flag used to indicate that the IME key has been seen and we need to wait
    * for the up event.
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.isHandlingIME_ = false;
 
   /**
    * The most recent keycode
-   * @type {?number}
+   * @type {number}
    * @private
    */
   this.lastKeyCode_ = -1;
@@ -192,7 +192,7 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
   /**
    * This is an ordered list of objects matched by
    * the text in the input
-   * @type {?Array.<Object|string>}
+   * @type {Array.<Object|string>}
    * @private
    */
   this.matchedObjects_ = [];
@@ -200,7 +200,7 @@ plana.ui.ac.InputHandler = function(element, opt_multi) {
   /**
    * Flag whether we should be case-insenstive when
    * checking for tokens against mapped objects
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.caseInsensitve_ = false;
@@ -235,6 +235,7 @@ plana.ui.ac.InputHandler.STANDARD_LIST_SEPARATORS = ',;';
 /**
  * Cleanup.
  * @override
+ * @suppress {checkTypes}
  */
 plana.ui.ac.InputHandler.prototype.disposeInternal = function() {
   plana.ui.ac.InputHandler.superClass_.disposeInternal.call(this);
@@ -258,6 +259,10 @@ plana.ui.ac.InputHandler.prototype.disposeInternal = function() {
   this.stopUpdateCheckTimer_();
 
   this.input_ = null;
+  if (this.updateTimer_ != null) {
+    this.updateTimer_.dispose();
+    this.updateTimer_ = null;
+  }
   this.updateInterval_ = null;
 
   this.keyHandler_.dispose();
@@ -289,7 +294,7 @@ plana.ui.ac.InputHandler.prototype.disposeInternal = function() {
  */
 plana.ui.ac.InputHandler.prototype.startUpdateCheckTimer_ = function() {
   this.updateTimer_ =
-    new goog.Timer( /** @type {number} */ (this.updateInterval_));
+    new goog.Timer(this.updateInterval_);
   this.eventHandler_.listen(this.updateTimer_,
     goog.Timer.TICK, this.onTick_, false);
   this.updateTimer_.start();
@@ -447,7 +452,7 @@ plana.ui.ac.InputHandler.prototype.handleSeparator_ = function(e) {
 
 /**
  * Send a DISMISS notification
- * @param {?goog.events.BrowserEvent} e
+ * @param {goog.events.BrowserEvent} e
  * @private
  */
 plana.ui.ac.InputHandler.prototype.onBlur_ = function(e) {
@@ -455,8 +460,10 @@ plana.ui.ac.InputHandler.prototype.onBlur_ = function(e) {
    * @type {plana.ui.ac.InputHandler}
    */
   var self = this;
-  /*send blur event slightly delayed in case it fires before
-   *the click event in the renderer has been fired and handled
+  /**
+   * send blur event slightly delayed in case it fires before
+   * the click event in the renderer has been fired and handled
+   * @suppress {checkTypes}
    */
   window.setTimeout(function() {
     if (!self.isDisposed()) {
@@ -477,7 +484,7 @@ plana.ui.ac.InputHandler.prototype.onBlur_ = function(e) {
  * @private
  */
 plana.ui.ac.InputHandler.prototype.onTick_ = function(e) {
-  var prevValue = /** @type {string} */ (this.previousValue_);
+  var prevValue = this.previousValue_;
   if (!this.areStringsEqual(prevValue, this.input_.value)) {
     this.sendChangeNotification_();
     this.previousValue_ = this.input_.value;
@@ -711,7 +718,7 @@ plana.ui.ac.InputHandler.prototype.selectRow = function(row) {
  * to set the token
  */
 plana.ui.ac.InputHandler.prototype.update = function(opt_force) {
-  var prevValue = /**@type {string} */ (this.previousValue_);
+  var prevValue = this.previousValue_;
   if (!this.areStringsEqual(prevValue, this.input_.value) ||
     opt_force) {
     this.sendChangeNotification_();
@@ -804,8 +811,7 @@ plana.ui.ac.InputHandler.prototype.setCaseInsensitive = function(newValue) {
  * @return {boolean}
  */
 plana.ui.ac.InputHandler.prototype.getCaseInsensitive = function() {
-  var caseInsensitive = /**@type {boolean}*/ (this.caseInsensitve_);
-  return caseInsensitive;
+  return this.caseInsensitve_;
 };
 
 /**

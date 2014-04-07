@@ -70,14 +70,14 @@ plana.ui.ts.TypeaheadSearch = function(
   /**
    * Flag whether we only search if the token changed
    * from the previous token used to search
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.forceUniqueTokenSearch_ = true;
 
   /**
    * Flag whether we're currently doing a fulltext search
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.searching_ = false;
@@ -95,6 +95,7 @@ plana.ui.ts.TypeaheadSearch.FULLTEXT_SEARCH_PARA = 'fulltextsearch';
 
 /**
  * @override
+ * @suppress {checkTypes}
  */
 plana.ui.ts.TypeaheadSearch.prototype.disposeInternal = function() {
   plana.ui.ts.TypeaheadSearch.superClass_.disposeInternal.call(this);
@@ -165,8 +166,8 @@ plana.ui.ts.TypeaheadSearch.prototype.onMatches_ = function(e) {
 
   this.cachingMatcher.disableLocalCache(false);
 
-  var input = /**@type {!HTMLInputElement}*/ (this.inputHandler.getInput());
-  var searchString = /**@type {!string}*/ (input.value);
+  var input = this.inputHandler.getInput();
+  var searchString = input.value;
   input.disabled = false;
   input.focus();
   this.searching_ = false;

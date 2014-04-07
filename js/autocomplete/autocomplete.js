@@ -69,21 +69,21 @@ plana.ui.ac.AutoComplete = function(
   /**
    * Flag whether the input supports separators and thus
    * we need to store an array of selected matches
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.isArrayModel_ = opt_multi || false;
 
   /**
    * The id to use for the autocomplete input element
-   * @type {?string}
+   * @type {string}
    * @private
    */
   this.inputId_ = opt_inputId || '';
 
   /**
    * Optional placeholder to show in the input textbox
-   * @type {?string}
+   * @type {string}
    * @private
    */
   this.placeholder_ = '';
@@ -92,7 +92,7 @@ plana.ui.ac.AutoComplete = function(
    * Custom renderer for this class. Its main job is to
    * attach custom classes to the container and its input
    * element
-   * @type {?plana.ui.ac.AutoCompleteRenderer}
+   * @type {plana.ui.ac.AutoCompleteRenderer}
    * @protected
    */
   this.componentRenderer = opt_renderer ||
@@ -101,7 +101,7 @@ plana.ui.ac.AutoComplete = function(
   /**
    * The matcher that combines a local cache of matches with
    * the remote matcher
-   * @type {?plana.ui.ac.CachingObjectMatcher}
+   * @type {plana.ui.ac.CachingObjectMatcher}
    * @protected
    */
   this.cachingMatcher =
@@ -111,7 +111,7 @@ plana.ui.ac.AutoComplete = function(
   /**
    * The renderer to render the list of suggestions for the
    * autocomplete component
-   * @type {?goog.ui.ac.Renderer}
+   * @type {goog.ui.ac.Renderer}
    * @private
    */
   this.autoCompleteRenderer_ = null;
@@ -135,7 +135,7 @@ plana.ui.ac.AutoComplete = function(
    * @see http://docs.closure-library.googlecode.com/git-history/7bb23f83ca959ae16e10ebc6734b0ba882629904/class_goog_ui_ac_InputHandler.html
    * Whether to prevent the default behavior (moving focus to another element)
    * when tab is pressed. This occurs by default only for multi-value mode.
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.preventDefaultOnTab_ = !! opt_multi;
@@ -194,6 +194,7 @@ plana.ui.ac.AutoComplete.PLACEHOLDER_ROW_CSS = 'ac-fetching-row';
 
 /**
  * @override
+ * @suppress {checkTypes}
  */
 plana.ui.ac.AutoComplete.prototype.disposeInternal = function() {
   plana.ui.ac.AutoComplete.superClass_.disposeInternal.call(this);
@@ -214,6 +215,7 @@ plana.ui.ac.AutoComplete.prototype.disposeInternal = function() {
     this.autoComplete.dispose();
     this.autoComplete = null;
   }
+  this.preventDefaultOnTab_ = null;
   this.fetchingMatchesDom_ = null;
   this.loadingContent_ = null;
   this.noMatchesDom_ = null;
@@ -721,9 +723,7 @@ plana.ui.ac.AutoComplete.prototype.getNonMatches = function() {
   /**
    * @type {?plana.ui.ac.InputHandler}
    */
-  var inputHandler =
-  /**@type {?plana.ui.ac.InputHandler}*/
-  (this.inputHandler);
+  var inputHandler = this.inputHandler;
   var entries = inputHandler.getEntries();
   var matches = inputHandler.getMatchedObjects();
   var filtered = goog.array.filter(entries,
