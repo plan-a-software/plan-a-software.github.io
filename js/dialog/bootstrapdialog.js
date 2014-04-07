@@ -114,7 +114,7 @@ plana.ui.BootstrapDialog = function(opt_domHelper) {
   /**
    * Flag whether we should dispose the dialog
    * on hiding
-   * @type {?boolean}
+   * @type {boolean}
    * @private
    */
   this.disposeOnHide_ = false;
