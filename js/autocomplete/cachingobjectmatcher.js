@@ -171,6 +171,15 @@ plana.ui.ac.CachingObjectMatcher = function(
    */
   this.disableLocalCache_ = false;
 
+  /**
+   * Flag whether we should send an empty token
+   * to the server, e.g. to act as a 'retrieve all' flag.
+   * Default: false
+   * @type {boolean}
+   * @private
+   */
+  this.sendEmptyToken_ = false;
+
   //listen to matcher events
   this.listen(this.remoteMatcher_, [
     plana.ui.ac.RemoteObjectMatcher.EventType.FAILED_REQUEST,
@@ -211,6 +220,7 @@ plana.ui.ac.CachingObjectMatcher.prototype.disposeInternal = function() {
   this.mostRecentMatches_ = null;
   this.currentState_ = null;
   this.disableLocalCache_ = null;
+  this.sendEmptyToken_ = null;
   plana.ui.ac.CachingObjectMatcher.superClass_.disposeInternal.call(this);
 };
 
@@ -224,7 +234,7 @@ plana.ui.ac.CachingObjectMatcher.prototype.disposeInternal = function() {
  */
 plana.ui.ac.CachingObjectMatcher.prototype.shouldRequestMatches = function(
   token, fullstring) {
-  return !goog.string.isEmptySafe(token);
+  return (!goog.string.isEmptySafe(token) || this.sendEmptyToken_);
 };
 
 /**
@@ -424,11 +434,10 @@ plana.ui.ac.CachingObjectMatcher.prototype.requestMatchingRows =
     var fetching = this.shouldRequestMatches(token, this.mostRecentString_);
     if (fetching) {
       this.currentState_ = plana.ui.ac.CachingObjectMatcher.State.FETCHING;
+      this.throttledTriggerBaseMatch_.fire();
     } else {
       this.currentState_ = plana.ui.ac.CachingObjectMatcher.State.READY;
     }
-
-    this.throttledTriggerBaseMatch_.fire();
 
     var matches = this.getCachedMatches(token, maxMatches);
 
@@ -573,6 +582,15 @@ plana.ui.ac.CachingObjectMatcher.prototype.clearCache = function() {
   }
   this.rows_.length = 0;
   this.rowStrings_ = {};
+};
+
+/**
+ * Setter for flag if we should send an empty token to the server to
+ * request matches.
+ * @param {boolean} sendEmpty
+ */
+plana.ui.ac.CachingObjectMatcher.prototype.sendEmptyToken = function(sendEmpty) {
+  this.sendEmptyToken_ = sendEmpty;
 };
 
 /**

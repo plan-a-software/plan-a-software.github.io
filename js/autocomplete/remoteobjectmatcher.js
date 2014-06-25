@@ -102,7 +102,7 @@ plana.ui.ac.RemoteObjectMatcher = function(
    * @type {string}
    * @private
    */
-  this.xhrIoRequestType_ = 'GET';
+  this.xhrIoRequestType_ = 'POST';
 
   /**
    * The event handler used by this class to listen to
